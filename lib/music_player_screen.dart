@@ -55,7 +55,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         .audioPlayer
         .onPositionChanged
         .listen((Duration newPosition) {
-
       int inSeconds = newPosition.inSeconds;
       int seconds = newPosition.inSeconds % 60;
       int minutes = newPosition.inMinutes;
@@ -151,37 +150,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     );
   }
 
-  // Widget _buildWidgetControlVolume() {
-  //   return Expanded(
-  //     child: Center(
-  //       child: Row(
-  //         children: <Widget>[
-  //           Icon(
-  //             Icons.volume_mute,
-  //             color: Colors.grey.withOpacity(0.5),
-  //           ),
-  //           Expanded(
-  //             child: Slider(
-  //               min: 0.0,
-  //               max: 1.0,
-  //               value: _sliderVolume,
-  //               activeColor: Colors.black,
-  //               inactiveColor: Colors.grey.withOpacity(0.5),
-  //               onChanged: (value) {
-  //                 setState(() => _sliderVolume = value);
-  //               },
-  //             ),
-  //           ),
-  //           Icon(
-  //             Icons.volume_up,
-  //             color: Colors.grey.withOpacity(0.5),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget _buildWidgetControlMusicPlayer() {
     return Expanded(
       child: Center(
@@ -189,64 +157,73 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // const Expanded(
-            //   child: Icon(Icons.fast_rewind),
-            // ),
+            Expanded(
+              child: IconButton(
+                  onPressed: () {
+                    context.read<AudioPlayerCubit>().stopAudio();
+                    startFunction();
+                    setState(() {
+                      _crossFadeState = CrossFadeState.showFirst;
+                    });
+                  },
+                  icon: const Icon(Icons.replay)),
+            ),
+            Expanded(
+              child: IconButton(
+                  onPressed: () {}, icon: const Icon(Icons.fast_rewind)),
+            ),
             Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.grey.withOpacity(0.5),
-                  ),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.grey.withOpacity(0.5),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(30.0),
-                  child: IconButton(
-                    onPressed: () {
-                      if (_replayCrossFadeState == CrossFadeState.showFirst) {
-                        if (_crossFadeState == CrossFadeState.showFirst) {
-                          print("pause");
-                          context.read<AudioPlayerCubit>().pauseAudio();
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: IconButton(
+                  onPressed: () {
+                    // if (_replayCrossFadeState == CrossFadeState.showFirst) {
+                    if (_crossFadeState == CrossFadeState.showFirst) {
+                      context.read<AudioPlayerCubit>().pauseAudio();
 
-                          setState(() {
-                            _crossFadeState = CrossFadeState.showSecond;
-                          });
-                        } else {
-                          print("resume");
-                          context.read<AudioPlayerCubit>().resumeAudio();
-                          setState(() {
-                            _crossFadeState = CrossFadeState.showFirst;
-                          });
-                        }
-                      } else {
-                        startFunction();
-                        setState(() {
-                          _replayCrossFadeState = CrossFadeState.showFirst;
-                        });
-                      }
-                    },
-                    icon: AnimatedCrossFade(
-                      crossFadeState: _replayCrossFadeState,
+                      setState(() {
+                        _crossFadeState = CrossFadeState.showSecond;
+                      });
+                    } else {
+                      context.read<AudioPlayerCubit>().resumeAudio();
+                      setState(() {
+                        _crossFadeState = CrossFadeState.showFirst;
+                      });
+                    }
+                    // }
+                    // else {
+                    //   startFunction();
+                    //   setState(() {
+                    //     _replayCrossFadeState = CrossFadeState.showFirst;
+                    //   });
+                    // }
+                  },
+                  icon: AnimatedCrossFade(
+                      crossFadeState: _crossFadeState,
                       duration: const Duration(milliseconds: 100),
                       firstCurve: Curves.easeIn,
                       secondCurve: Curves.easeOut,
-                      firstChild: AnimatedCrossFade(
-                          crossFadeState: _crossFadeState,
-                          duration: const Duration(milliseconds: 100),
-                          firstCurve: Curves.easeIn,
-                          secondCurve: Curves.easeOut,
-                          firstChild: Transform.scale(
-                              scale: 1.5, child: const Icon(Icons.pause)),
-                          secondChild: Transform.scale(
-                              scale: 1.5, child: const Icon(Icons.play_arrow))),
+                      firstChild: Transform.scale(
+                          scale: 1.5, child: const Icon(Icons.pause)),
                       secondChild: Transform.scale(
-                          scale: 1.5, child: const Icon(Icons.replay)),
-                    ),
-                  ),
-                )),
-            // const Expanded(
-            //   child: Icon(Icons.fast_forward),
-            // ),
+                          scale: 1.5, child: const Icon(Icons.play_arrow))),
+                ),
+              ),
+            ),
+            Expanded(
+              child: IconButton(
+                  onPressed: () {}, icon: const Icon(Icons.fast_forward)),
+            ),
+            Expanded(
+              child: IconButton(
+                  onPressed: () {}, icon: const Icon(Icons.favorite_border)),
+            ),
           ],
         ),
       ),
@@ -306,16 +283,42 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     );
   }
 
+  // Slider(
+  //   min: 0,
+  //   max: duration.inSeconds.toDouble(),
+  //   value: position.inSeconds.toDouble(),
+  //   onChanged: (value) async {
+  //     final position = Duration(seconds: value.toInt());
+  //     await audioPlayer.seek(position);
+  //     // can be changed to not resume
+  //     await audioPlayer.resume();
+  //   },
+  // ),
   Widget _buildWidgetLinearProgressIndicator() {
-    return SizedBox(
-      height: 4.0,
-      child: LinearProgressIndicator(
-        value: positionInSeconds / durationInSeconds,
-        valueColor: const AlwaysStoppedAnimation<Color>(
-          Color(0xFF7D9AFF),
-        ),
-        backgroundColor: Colors.grey.withOpacity(0.2),
-      ),
+    // return SizedBox(
+    //   height: 4.0,
+    //   child: LinearProgressIndicator(
+    //     value: positionInSeconds / durationInSeconds,
+    //     valueColor: const AlwaysStoppedAnimation<Color>(
+    //       Color(0xFF7D9AFF),
+    //     ),
+    //     backgroundColor: Colors.grey.withOpacity(0.2),
+    //   ),
+    // );
+    return Slider(
+      label: durationInSeconds.toString(),
+      min: 0,
+      max: durationInSeconds.toDouble(),
+      value: positionInSeconds.toDouble(),
+      onChanged: (value) async {
+        final position = Duration(seconds: value.toInt());
+        await context.read<AudioPlayerCubit>().audioPlayer.seek(position);
+        // can be changed to not resume
+        if (!mounted) return;
+        if (_crossFadeState == CrossFadeState.showFirst) {
+          await context.read<AudioPlayerCubit>().audioPlayer.resume();
+        }
+      },
     );
   }
 
@@ -349,7 +352,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           GestureDetector(
             onTap: () {
               Navigator.pop(context);
-              context.read<AudioPlayerCubit>().stopAudio();
+              // context.read<AudioPlayerCubit>().stopAudio();
             },
             child: Icon(
               Platform.isIOS ? Icons.arrow_back_ios : Icons.arrow_back,

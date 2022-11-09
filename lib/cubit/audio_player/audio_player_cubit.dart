@@ -27,6 +27,7 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
 
     await audioPlayer.setSource(AssetSource(path));
     await audioPlayer.resume();
+    // audioPlayer.
     audioPlayer.onPlayerStateChanged.listen((state) {
       isPlaying = state == PlayerState.playing;
     });
