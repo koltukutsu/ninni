@@ -12,12 +12,13 @@ class MusicPlayerScreen extends StatefulWidget {
   final int index;
   final String duration;
 
-  const MusicPlayerScreen({super.key,
-    required this.urlPath,
-    required this.author,
-    required this.title,
-    required this.index,
-    required this.duration});
+  const MusicPlayerScreen(
+      {super.key,
+      required this.urlPath,
+      required this.author,
+      required this.title,
+      required this.index,
+      required this.duration});
 
   @override
   _MusicPlayerScreenState createState() => _MusicPlayerScreenState();
@@ -41,24 +42,25 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
   Future<void> startFunction() async {
     // context.read<AudioPlayerCubit>().resetAudioPlayer();
-    context
+
+    await context
         .read<AudioPlayerCubit>()
         .setAudioAndPlay(path: widget.urlPath, index: widget.index);
 
-    context.read<AudioPlayerCubit>().resumeAudio();
+    // context.read<AudioPlayerCubit>().resumeAudio();
+    if (!mounted) return;
     context
         .read<AudioPlayerCubit>()
         .audioPlayer
         .onPositionChanged
         .listen((Duration newPosition) {
+          int inSeconds = newPosition.inSeconds;
       int seconds = newPosition.inSeconds % 60;
       int minutes = newPosition.inMinutes;
       setState(() {
         position =
-        "${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10
-            ? '0$seconds'
-            : seconds}";
-        positionInSeconds = seconds;
+            "${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10 ? '0$seconds' : seconds}";
+        positionInSeconds = inSeconds;
       });
     });
 
@@ -72,6 +74,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         durationInSeconds = getDurationInSeconds;
       });
     });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    // context.read<AudioPlayerCubit>().audioPlayer.stop();
   }
 
   @override
@@ -171,10 +180,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       child: Center(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Expanded(
-              child: Icon(Icons.fast_rewind),
-            ),
+            // const Expanded(
+            //   child: Icon(Icons.fast_rewind),
+            // ),
             Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -183,21 +193,23 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(40.0),
                   child: IconButton(
                     onPressed: () {
-                      if (_crossFadeState == CrossFadeState.showSecond) {
-                        // pause
+                      if (_crossFadeState == CrossFadeState.showFirst) {
+                        print("pause");
                         context.read<AudioPlayerCubit>().pauseAudio();
-                        setState(() {
-                          _crossFadeState = CrossFadeState.showFirst;
-                        });
-                      } else {
-                        // resume
-                        context.read<AudioPlayerCubit>().resumeAudio();
+
                         setState(() {
                           _crossFadeState = CrossFadeState.showSecond;
                         });
+                      } else {
+                        print("resume");
+                        context.read<AudioPlayerCubit>().resumeAudio();
+                        setState(() {
+                          _crossFadeState = CrossFadeState.showFirst;
+                        });
+
                       }
                     },
                     icon: AnimatedCrossFade(
@@ -211,9 +223,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                             scale: 1.5, child: const Icon(Icons.play_arrow))),
                   ),
                 )),
-            const Expanded(
-              child: Icon(Icons.fast_forward),
-            ),
+            // const Expanded(
+            //   child: Icon(Icons.fast_forward),
+            // ),
           ],
         ),
       ),
@@ -231,7 +243,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontFamily: "Campton_Light",
-              fontSize: 20.0,
+              fontSize: 25.0,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -243,6 +255,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               fontFamily: "Campton_Light",
               color: Color(0xFF7D9AFF),
               fontWeight: FontWeight.w600,
+              fontSize: 20,
             ),
           ),
         ],

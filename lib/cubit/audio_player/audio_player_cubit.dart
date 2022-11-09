@@ -20,13 +20,13 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
       audioPlayer.stop();
       // audioPlayer.dispose();
     }
-    print(12);
     playingIndex = index;
-    audioPlayer.setReleaseMode(ReleaseMode.loop);
+    audioPlayer.setReleaseMode(ReleaseMode.stop);
     // audioPlayer.setSourceDeviceFile(path);
     // audioPlayer.setSourceAsset(path);
-    audioPlayer.setSource(AssetSource(path));
 
+    await audioPlayer.setSource(AssetSource(path));
+    await audioPlayer.resume();
     audioPlayer.onPlayerStateChanged.listen((state) {
       isPlaying = state == PlayerState.playing;
     });
