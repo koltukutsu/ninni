@@ -7,8 +7,9 @@ part "audio_player_state.dart";
 class AudioPlayerCubit extends Cubit<AudioPlayerState> {
   final AudioPlayer audioPlayer;
   var isPlaying = false;
-  var duration = 0.0;
-  var position = 0.0;
+
+  // var duration = 0;
+  // var position = 0;
   var playingIndex = -1;
 
   AudioPlayerCubit({required this.audioPlayer}) : super(IdleState());
@@ -19,21 +20,26 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
       audioPlayer.stop();
       // audioPlayer.dispose();
     }
+    print(12);
     playingIndex = index;
     audioPlayer.setReleaseMode(ReleaseMode.loop);
-    audioPlayer.setSourceDeviceFile(path);
+    // audioPlayer.setSourceDeviceFile(path);
+    // audioPlayer.setSourceAsset(path);
+    audioPlayer.setSource(AssetSource(path));
 
     audioPlayer.onPlayerStateChanged.listen((state) {
       isPlaying = state == PlayerState.playing;
     });
 
-    audioPlayer.onDurationChanged.listen((newDuration) {
-      // duration = newDuration as double;
-    });
-
-    audioPlayer.onDurationChanged.listen((newPosition) {
-      // position = newPosition as double;
-    });
+    // audioPlayer.onDurationChanged.listen((Duration newDuration) {
+    //   duration = newDuration.inSeconds;
+    //   // print(duration);
+    // });
+    //
+    // audioPlayer.onPositionChanged.listen((Duration newPosition) {
+    //   position = newPosition.inSeconds;
+    //   print("sure: $position");
+    // });
   }
 
   stopAudio() {
@@ -44,11 +50,15 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
     audioPlayer.resume();
   }
 
+  pauseAudio() {
+    audioPlayer.pause();
+  }
+
   resetAudioPlayer() {
     stopAudio();
     isPlaying = false;
     playingIndex = -1;
-    duration = 0.0;
-    position = 0.0;
+    // duration = 0;
+    // position = 0;
   }
 }
