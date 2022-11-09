@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:ninni_1/constants/app_colors.dart';
 import 'package:ninni_1/constants/app_paths.dart';
@@ -119,7 +121,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 Song song = listSong[index];
                 return GestureDetector(
                   onTap: () {
-                    _navigatorToMusicPlayerScreen(song.title, song.urlPath, index, song.duration);
+                    _navigatorToMusicPlayerScreen(
+                        index: index,
+                        duration: song.duration,
+                        urlPath: song.urlPath,
+                        imgPath: song.imgPath,
+                        title: song.title);
                   },
                   child: Row(
                     children: <Widget>[
@@ -184,30 +191,45 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Widget _buildWidgetFloatingActionButton(MediaQueryData mediaQuery) {
-  //   return Align(
-  //     alignment: Alignment.topRight,
-  //     child: Padding(
-  //       padding: EdgeInsets.only(
-  //         top: mediaQuery.size.height / 1.8 - 32.0,
-  //         right: 32.0,
-  //       ),
-  //       child: FloatingActionButton(
-  //         backgroundColor: const Color(0xFF7D9AFF),
-  //         onPressed: () {
-  //           _navigatorToMusicPlayerScreen(
-  //               listSong[0].title, listSong[0].urlPath);
-  //         },
-  //         child: const Icon(
-  //           Icons.play_arrow,
-  //           color: Colors.white,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget _buildWidgetFloatingActionButton(MediaQueryData mediaQuery) {
+    return Align(
+      alignment: Alignment.topRight,
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: mediaQuery.size.height / 1.8 - 32.0,
+          right: 32.0,
+        ),
+        child: FloatingActionButton(
+          backgroundColor: const Color(0xFF7D9AFF),
+          onPressed: () {
+            final randomSeedForSong = Random();
+            final int randomSongIndex =
+                randomSeedForSong.nextInt(listSong.length);
+            final Song randomSongFromList = listSong.elementAt(randomSongIndex);
 
-  void _navigatorToMusicPlayerScreen(String title, String urlPath, int index, String duration) {
+            _navigatorToMusicPlayerScreen(
+              title: randomSongFromList.title,
+              imgPath: randomSongFromList.imgPath,
+              urlPath: randomSongFromList.urlPath,
+              duration: randomSongFromList.duration,
+              index: randomSongIndex,
+            );
+          },
+          child: const Icon(
+            Icons.shuffle,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _navigatorToMusicPlayerScreen(
+      {required String title,
+      required String urlPath,
+      required int index,
+      required String duration,
+      required String imgPath}) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return MusicPlayerScreen(
         title: title,
@@ -215,6 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
         urlPath: urlPath,
         index: index,
         duration: duration,
+        imgPath: imgPath,
       );
     }));
   }
@@ -252,8 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
           bottomLeft: Radius.circular(48.0),
         ),
         image: DecorationImage(
-          image:
-              AssetImage("assets/photos/ninni_resim.png"),
+          image: AssetImage("assets/photos/ninni_resim.png"),
           fit: BoxFit.cover,
         ),
       ),
@@ -263,44 +285,54 @@ class _HomeScreenState extends State<HomeScreen> {
   void initListSong() {
     listSong.add(Song(
         title: "Atem Tutem Men Seni",
-        duration: "3.18",
+        duration: "03:18",
+        imgPath: AppPaths.atemTutemBenSeniImage,
         urlPath: AppPaths.atemTutemBenSeni));
     listSong.add(Song(
         title: "Rengarenk Düşlerdesin",
-        duration: "3.11",
+        duration: "03:11",
+        imgPath: AppPaths.rengarenkDuslerdesinImage,
         urlPath: AppPaths.rengarenkDuslerdesin));
     listSong.add(Song(
         title: "Yum Gözlerini Yum",
-        duration: "2.20",
+        imgPath: AppPaths.yumGozleriniYumImage,
+        duration: "02:20",
         urlPath: AppPaths.yumGozleriniYum));
     listSong.add(Song(
         title: "Fış Fış Kayıkçı",
-        duration: "2.21",
+        imgPath: AppPaths.fisFisKayikciImage,
+        duration: "02:21",
         urlPath: AppPaths.fisFisKayikci));
     listSong.add(Song(
         title: "Annesi Onu Çok Severmiş",
-        duration: "2.36",
+        duration: "02:36",
+        imgPath: AppPaths.annesiOnuCokSevermisImage,
         urlPath: AppPaths.annesiOnuCokSevermis));
     listSong.add(Song(
         title: "Kırmızı Balık Gölde",
-        duration: "1.19",
+        imgPath: AppPaths.kirmiziBalikGoldeImage,
+        duration: "01:19",
         urlPath: AppPaths.kirmiziBalikGolde));
     listSong.add(Song(
         title: "Meyveler Şarkısı",
-        duration: "2.34",
+        duration: "02:34",
+        imgPath: AppPaths.meyvelerImage,
         urlPath: AppPaths.meyveler));
     listSong.add(Song(
         title: "Portakalı Soydum",
-        duration: "1.22",
+        duration: "01:22",
+        imgPath: AppPaths.portakaliSoydumImage,
         urlPath: AppPaths.portakaliSoydum));
     listSong.add(Song(
         title: "Uyusunda Büyüsün - Dandini Dandini Dastana",
-        duration: "4.35",
+        duration: "04:35",
+        imgPath: AppPaths.uyusundaBuyusunDandiniImage,
         urlPath: AppPaths.uyusundaBuyusunDandini));
     listSong.add(Song(
         title: "Uyusunda Büyüsün",
-        duration: "3.00",
-        urlPath: AppPaths.uyusundaBuyusun));
+        duration: "03:00",
+        urlPath: AppPaths.uyusundaBuyusun,
+        imgPath: AppPaths.uyusundaBuyusunImage));
   }
 }
 
@@ -308,8 +340,13 @@ class Song {
   final String title;
   final String duration;
   final String urlPath;
+  final String imgPath;
 
-  Song({required this.title, required this.duration, this.urlPath = "assets/"});
+  Song(
+      {required this.title,
+      required this.imgPath,
+      required this.duration,
+      this.urlPath = "assets/"});
 
   @override
   String toString() {

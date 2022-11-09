@@ -11,6 +11,7 @@ class MusicPlayerScreen extends StatefulWidget {
   final String author;
   final int index;
   final String duration;
+  final String imgPath;
 
   const MusicPlayerScreen(
       {super.key,
@@ -18,6 +19,7 @@ class MusicPlayerScreen extends StatefulWidget {
       required this.author,
       required this.title,
       required this.index,
+      required this.imgPath,
       required this.duration});
 
   @override
@@ -26,8 +28,7 @@ class MusicPlayerScreen extends StatefulWidget {
 
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   CrossFadeState _crossFadeState = CrossFadeState.showFirst;
-  double _sliderDurationMusic = 50.0;
-  double _sliderVolume = 0.5;
+  CrossFadeState _replayCrossFadeState = CrossFadeState.showFirst;
   String position = "00:00";
   int positionInSeconds = 0;
   int durationInSeconds = 100;
@@ -54,7 +55,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         .audioPlayer
         .onPositionChanged
         .listen((Duration newPosition) {
-          int inSeconds = newPosition.inSeconds;
+
+      int inSeconds = newPosition.inSeconds;
       int seconds = newPosition.inSeconds % 60;
       int minutes = newPosition.inMinutes;
       setState(() {
@@ -73,6 +75,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       setState(() {
         durationInSeconds = getDurationInSeconds;
       });
+      if (durationInSeconds == positionInSeconds) {
+        setState(() {
+          _replayCrossFadeState = CrossFadeState.showSecond;
+        });
+      }
     });
   }
 
@@ -132,10 +139,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               _buildWidgetLinearProgressIndicator(),
               const SizedBox(height: 4.0),
               _buildWidgetLabelDurationMusic(),
-              const SizedBox(height: 36.0),
+              const SizedBox(height: 12.0),
               _buildWidgetMusicInfo(),
               _buildWidgetControlMusicPlayer(),
-              const SizedBox(height: 36.0),
+              const SizedBox(height: 56.0),
               // _buildWidgetControlVolume(),
             ],
           ),
@@ -193,34 +200,48 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(40.0),
+                  padding: const EdgeInsets.all(30.0),
                   child: IconButton(
                     onPressed: () {
-                      if (_crossFadeState == CrossFadeState.showFirst) {
-                        print("pause");
-                        context.read<AudioPlayerCubit>().pauseAudio();
+                      if (_replayCrossFadeState == CrossFadeState.showFirst) {
+                        if (_crossFadeState == CrossFadeState.showFirst) {
+                          print("pause");
+                          context.read<AudioPlayerCubit>().pauseAudio();
 
-                        setState(() {
-                          _crossFadeState = CrossFadeState.showSecond;
-                        });
+                          setState(() {
+                            _crossFadeState = CrossFadeState.showSecond;
+                          });
+                        } else {
+                          print("resume");
+                          context.read<AudioPlayerCubit>().resumeAudio();
+                          setState(() {
+                            _crossFadeState = CrossFadeState.showFirst;
+                          });
+                        }
                       } else {
-                        print("resume");
-                        context.read<AudioPlayerCubit>().resumeAudio();
+                        startFunction();
                         setState(() {
-                          _crossFadeState = CrossFadeState.showFirst;
+                          _replayCrossFadeState = CrossFadeState.showFirst;
                         });
-
                       }
                     },
                     icon: AnimatedCrossFade(
-                        crossFadeState: _crossFadeState,
-                        duration: const Duration(milliseconds: 100),
-                        firstCurve: Curves.easeIn,
-                        secondCurve: Curves.easeOut,
-                        firstChild: Transform.scale(
-                            scale: 1.5, child: const Icon(Icons.pause)),
-                        secondChild: Transform.scale(
-                            scale: 1.5, child: const Icon(Icons.play_arrow))),
+                      crossFadeState: _replayCrossFadeState,
+                      duration: const Duration(milliseconds: 100),
+                      firstCurve: Curves.easeIn,
+                      secondCurve: Curves.easeOut,
+                      firstChild: AnimatedCrossFade(
+                          crossFadeState: _crossFadeState,
+                          duration: const Duration(milliseconds: 100),
+                          firstCurve: Curves.easeIn,
+                          secondCurve: Curves.easeOut,
+                          firstChild: Transform.scale(
+                              scale: 1.5, child: const Icon(Icons.pause)),
+                          secondChild: Transform.scale(
+                              scale: 1.5, child: const Icon(Icons.play_arrow))),
+                      secondChild: Transform.scale(
+                          scale: 1.5, child: const Icon(Icons.replay)),
+                    ),
                   ),
                 )),
             // const Expanded(
@@ -271,14 +292,14 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           position,
           style: const TextStyle(
             color: Colors.grey,
-            fontSize: 12.0,
+            fontSize: 16.0,
           ),
         ),
         Text(
           widget.duration,
           style: const TextStyle(
             color: Colors.grey,
-            fontSize: 12.0,
+            fontSize: 16.0,
           ),
         ),
       ],
@@ -287,7 +308,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
   Widget _buildWidgetLinearProgressIndicator() {
     return SizedBox(
-      height: 2.0,
+      height: 4.0,
       child: LinearProgressIndicator(
         value: positionInSeconds / durationInSeconds,
         valueColor: const AlwaysStoppedAnimation<Color>(
@@ -303,14 +324,14 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       child: Container(
         width: mediaQuery.size.width / 2.5,
         height: mediaQuery.size.width / 2.5,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.all(
+          borderRadius: const BorderRadius.all(
             Radius.circular(24.0),
           ),
           image: DecorationImage(
             image: AssetImage(
-              "assets/photos/ninni_resim.png",
+              "assets/${widget.imgPath}",
             ),
             fit: BoxFit.cover,
           ),
@@ -328,6 +349,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           GestureDetector(
             onTap: () {
               Navigator.pop(context);
+              context.read<AudioPlayerCubit>().stopAudio();
             },
             child: Icon(
               Platform.isIOS ? Icons.arrow_back_ios : Icons.arrow_back,
@@ -335,7 +357,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             ),
           ),
           const Text(
-            "Artist",
+            "Ninniler",
             style: TextStyle(
               color: Colors.white,
               fontFamily: "Campton_Light",
@@ -343,10 +365,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               fontSize: 16.0,
             ),
           ),
-          const Icon(
-            Icons.info_outline,
-            color: Colors.white,
-          ),
+          // const Icon(
+          //   Icons.info_outline,
+          //   color: Colors.white,
+          // ),
         ],
       ),
     );
@@ -356,10 +378,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     return Container(
       width: double.infinity,
       height: mediaQuery.size.height / 1.8,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.rectangle,
         image: DecorationImage(
-          image: AssetImage("assets/photos/ninni_resim.png"),
+          image: AssetImage("assets/${widget.imgPath}"),
           fit: BoxFit.cover,
         ),
       ),
