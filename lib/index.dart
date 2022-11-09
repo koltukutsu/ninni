@@ -1,8 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ninni_1/constants/app_colors.dart';
 import 'package:ninni_1/constants/app_paths.dart';
+import 'package:ninni_1/cubit/song_cubit/song_cubit.dart';
 import 'package:ninni_1/music_player_screen.dart';
 
 GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
@@ -20,7 +22,11 @@ class _HomeScreenState extends State<HomeScreen> {
     initListSong();
     super.initState();
   }
-
+  void refreshFunction(){
+    setState(() {
+      listSong;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     var mediaQuery = MediaQuery.of(context);
@@ -32,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _buildWidgetAlbumCover(mediaQuery),
           // _buildWidgetActionAppBar(mediaQuery),
           _buildWidgetArtistName(mediaQuery),
+          _buildWidgetCategory(mediaQuery),
           // _buildWidgetFloatingActionButton(mediaQuery),
           _buildWidgetListSong(mediaQuery),
         ],
@@ -49,9 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
             return Stack(
               children: <Widget>[
                 Positioned(
-                  top: constraints.maxHeight - 100.0,
+                  top: constraints.maxHeight - 220.0,
                   child: const Text(
-                    "Ninniler",
+                    "Moi",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: "CoralPen",
@@ -60,9 +67,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 Positioned(
-                  top: constraints.maxHeight - 160.0,
+                  top: constraints.maxHeight - 120.0,
                   child: const Text(
-                    "Bizden",
+                    "",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: "CoralPen",
@@ -73,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Positioned(
                   top: constraints.maxHeight - 180.0,
                   child: const Text(
-                    "Türkiye",
+                    "",
                     style: TextStyle(
                       color: Color(0xFF7D9AFF),
                       fontSize: 14.0,
@@ -169,10 +176,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildWidgetHeaderSong() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: const <Widget>[
+      children: <Widget>[
         Text(
-          "Tüm Ninniler",
-          style: TextStyle(
+          context.read<SongCubit>().category,
+          style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.w600,
             fontSize: 34.0,
@@ -224,15 +231,116 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildWidgetCategory(MediaQueryData mediaQuery) {
+    return Align(
+      alignment: Alignment.topRight,
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: mediaQuery.size.height * 0.15,
+          right: 32.0,
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FloatingActionButton(
+                backgroundColor: context.read<SongCubit>().category == "Ninniler"
+                    ? const Color(0xFF7D9AFF)
+                    : Colors.cyan,
+                onPressed: () {
+                  context.read<SongCubit>().setCategory(userCategory: "Ninniler");
+                  setState(() {
+                    listSong = context.read<SongCubit>().theList["Ninniler"]!;
+                  });
+                },
+                child: const Icon(
+                  Icons.width_normal_outlined,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FloatingActionButton(
+                backgroundColor:
+                    context.read<SongCubit>().category == "Eğlenceli Şarkılar"
+                        ? const Color(0xFF7D9AFF)
+                        : Colors.cyan,
+                onPressed: () {
+                  context
+                      .read<SongCubit>()
+                      .setCategory(userCategory: "Eğlenceli Şarkılar");
+                  setState(() {
+                    listSong = context
+                        .read<SongCubit>()
+                        .theList["Eğlenceli Şarkılar"]!;
+                  });
+                },
+                child: const Icon(
+                  Icons.add_alert,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FloatingActionButton(
+                backgroundColor:
+                    context.read<SongCubit>().category == "Beyaz Gürültüler"
+                        ? const Color(0xFF7D9AFF)
+                        : Colors.cyan,
+                onPressed: () {
+                  context
+                      .read<SongCubit>()
+                      .setCategory(userCategory: "Beyaz Gürültüler");
+                  setState(() {
+                    listSong = context.read<SongCubit>().theList["Beyaz Gürültüler"]!;
+                  });
+                },
+                child: const Icon(
+                  Icons.ac_unit,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FloatingActionButton(
+                backgroundColor:
+                    context.read<SongCubit>().category == "Favorilerim"
+                        ? const Color(0xFF7D9AFF)
+                        : Colors.cyan,
+                onPressed: () {
+                  context
+                      .read<SongCubit>()
+                      .setCategory(userCategory: "Favorilerim");
+                  setState(() {
+                    listSong = context.read<SongCubit>().theList["Favorilerim"]!;
+                  });
+                },
+                child: const Icon(
+                  Icons.favorite_border_outlined,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _navigatorToMusicPlayerScreen(
       {required String title,
       required String urlPath,
       required int index,
       required String duration,
       required String imgPath}) {
+    context.read<SongCubit>().setSong(userTitle: title);
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return MusicPlayerScreen(
         title: title,
+        refreshFunction: refreshFunction,
         author: "Ninniler",
         urlPath: urlPath,
         index: index,

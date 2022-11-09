@@ -4,6 +4,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ninni_1/cubit/audio_player/audio_player_cubit.dart';
+import 'package:ninni_1/cubit/song_cubit/song_cubit.dart';
+import 'package:ninni_1/index.dart';
 
 class MusicPlayerScreen extends StatefulWidget {
   final String title;
@@ -12,10 +14,11 @@ class MusicPlayerScreen extends StatefulWidget {
   final int index;
   final String duration;
   final String imgPath;
-
+  final VoidCallback refreshFunction;
   const MusicPlayerScreen(
       {super.key,
       required this.urlPath,
+        required this.refreshFunction,
       required this.author,
       required this.title,
       required this.index,
@@ -222,7 +225,44 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             ),
             Expanded(
               child: IconButton(
-                  onPressed: () {}, icon: const Icon(Icons.favorite_border)),
+                  onPressed: () {
+                    final bool isFavorited = context
+                            .read<SongCubit>()
+                            .theList["Favorilerim"]!
+                            .indexWhere(
+                              (Song theSongFav) =>
+                                  theSongFav.title == widget.title,
+                            ) !=
+                        -1;
+                    print(isFavorited);
+                    if (isFavorited) {
+                      final Song theCurrentSong =
+                          context.read<SongCubit>().currentSong;
+                      context
+                          .read<SongCubit>()
+                          .theList["Favorilerim"]!
+                          .remove(theCurrentSong);
+                    } else {
+                      final Song theCurrentSong =
+                          context.read<SongCubit>().currentSong;
+                      context
+                          .read<SongCubit>()
+                          .theList["Favorilerim"]!
+                          .add(theCurrentSong);
+                    }
+
+                    setState(() {});
+                  },
+                  icon: context
+                              .read<SongCubit>()
+                              .theList["Favorilerim"]!
+                              .indexWhere(
+                                (Song theSongFav) =>
+                                    theSongFav.title == widget.title,
+                              ) ==
+                          -1
+                      ? const Icon(Icons.favorite_border)
+                      : const Icon(Icons.favorite)),
             ),
           ],
         ),
@@ -352,6 +392,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           GestureDetector(
             onTap: () {
               Navigator.pop(context);
+              widget.refreshFunction();
               // context.read<AudioPlayerCubit>().stopAudio();
             },
             child: Icon(

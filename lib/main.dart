@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ninni_1/cubit/audio_player/audio_player_cubit.dart';
+import 'package:ninni_1/cubit/song_cubit/song_cubit.dart';
 import 'package:ninni_1/index.dart';
 
 import 'music_player_screen.dart';
@@ -15,7 +16,9 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => AudioPlayerCubit(audioPlayer: AudioPlayer()))
+        BlocProvider(
+            create: (context) => AudioPlayerCubit(audioPlayer: AudioPlayer())),
+        BlocProvider(create: (context) => SongCubit())
       ],
       child: MaterialApp(
         theme: ThemeData(
