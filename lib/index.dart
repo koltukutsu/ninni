@@ -65,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Positioned(
                   top: constraints.maxHeight - 220.0,
                   child: const Text(
-                    "Moi",
+                    "Mooi",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: "CoralPen",

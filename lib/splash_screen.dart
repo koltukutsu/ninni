@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
         Image.asset("assets/photos/ninni.jpg", fit: BoxFit.fitHeight),
         Center(
           child: const Text(
-            "Moi",
+            "Mooi",
             style: TextStyle(
               color: Colors.white,
               fontFamily: "CoralPen",
