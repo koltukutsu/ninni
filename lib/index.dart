@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ninni_1/constants/app_colors.dart';
-import 'package:ninni_1/constants/app_paths.dart';
 import 'package:ninni_1/cubit/song_cubit/song_cubit.dart';
 import 'package:ninni_1/music_player_screen.dart';
 
@@ -20,7 +19,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     initListSong();
-    context.read<SongCubit>().loadTheFavorites();
     super.initState();
   }
 
@@ -402,28 +400,28 @@ class _HomeScreenState extends State<HomeScreen> {
     }));
   }
 
-  Widget _buildWidgetActionAppBar(MediaQueryData mediaQuery) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16.0,
-        top: mediaQuery.padding.top + 16.0,
-        right: 16.0,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: const <Widget>[
-          Icon(
-            Icons.menu,
-            color: Colors.white,
-          ),
-          Icon(
-            Icons.info_outline,
-            color: Colors.white,
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildWidgetActionAppBar(MediaQueryData mediaQuery) {
+  //   return Padding(
+  //     padding: EdgeInsets.only(
+  //       left: 16.0,
+  //       top: mediaQuery.padding.top + 16.0,
+  //       right: 16.0,
+  //     ),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: const <Widget>[
+  //         Icon(
+  //           Icons.menu,
+  //           color: Colors.white,
+  //         ),
+  //         Icon(
+  //           Icons.info_outline,
+  //           color: Colors.white,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildWidgetAlbumCover(MediaQueryData mediaQuery) {
     return Container(
@@ -519,6 +517,25 @@ class Song {
 
   @override
   String toString() {
-    return 'Song{title: $title, duration: $duration}';
+    // return 'Song{title: $title, duration: $duration, imgPath:$imgPath, category:$category, indexId:$indexId, urlPath: $urlPath}';
+    return '{"title": "$title", "duration": "$duration", "imgPath":"$imgPath", "category":"$category", "indexId":"$indexId", "urlPath": "$urlPath"}';
   }
+
+  Song.fromJson(Map<String, dynamic> json)
+      : title = json['title'],
+        imgPath = json['duration'],
+        duration = json['imgPath'],
+        category = json['category'],
+        indexId = json['indexId'],
+        urlPath = json['urlPath'];
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'imgPath': imgPath,
+    'duration': duration,
+    'category': category,
+    'indexId': indexId,
+    'urlPath': urlPath,
+
+  };
 }

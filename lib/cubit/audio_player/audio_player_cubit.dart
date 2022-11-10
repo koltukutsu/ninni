@@ -34,12 +34,10 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
 
     // audioPlayer.onDurationChanged.listen((Duration newDuration) {
     //   duration = newDuration.inSeconds;
-    //   // print(duration);
     // });
     //
     // audioPlayer.onPositionChanged.listen((Duration newPosition) {
     //   position = newPosition.inSeconds;
-    //   print("sure: $position");
     // });
   }
 

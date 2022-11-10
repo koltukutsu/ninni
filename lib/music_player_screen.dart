@@ -31,7 +31,7 @@ class MusicPlayerScreen extends StatefulWidget {
 
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   CrossFadeState _crossFadeState = CrossFadeState.showFirst;
-  CrossFadeState _replayCrossFadeState = CrossFadeState.showFirst;
+  // CrossFadeState _replayCrossFadeState = CrossFadeState.showFirst;
   String position = "00:00";
   int positionInSeconds = 0;
   int durationInSeconds = 100;
@@ -199,7 +199,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                       //           duration: previousSong.duration,
                       //         )));
                     } else {
-                      // print("bitti previous song");
                       _showDialog(
                           context, const Color(0xFF33609B),
                           "Listenin başına geldin",
@@ -259,7 +258,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                     final Song? nextSong =
                     context.read<SongCubit>().getNextSong();
                     if (nextSong != null) {
-                      print("icerde next song");
                       startFunction(
                           urlPath: nextSong.urlPath, index: nextSong.indexId);
                       setState(() {
@@ -279,7 +277,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                       //           duration: nextSong.duration,
                       //         )));
                     } else {
-                      // print("bitti next song");
                       _showDialog(
                           context, const Color(0xFF33609B),
                           "Listenin sonuna geldin",
@@ -309,7 +306,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                       context
                           .read<SongCubit>()
                           .theList["Favorilerim"]!
-                          .remove(theCurrentSong);
+                          .removeWhere((Song iteratedSong) => iteratedSong.title == theCurrentSong.title);
                       context.read<SongCubit>().reindexFavoriteSongs();
 
                     } else {

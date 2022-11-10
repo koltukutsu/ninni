@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import "package:equatable/equatable.dart";
 import 'package:ninni_1/constants/app_paths.dart';
@@ -139,9 +141,12 @@ class SongCubit extends Cubit<SongState> {
   List<String> encode({required List<Song> songList}) {
     List<String> encodedList = [];
     for (final Song oneSong in songList) {
-      final String oneSongCategory = oneSong.category;
-      final int oneSongIndexId = oneSong.indexId;
-      encodedList.add("$oneSongCategory$splitMark$oneSongIndexId");
+      // final String oneSongCategory = oneSong.category;
+      // final String oneSongCategory = "Favorilerim";
+      // final int oneSongIndexId = oneSong.indexId;
+      final String mapAsString = oneSong.toString();
+      // encodedList.add("$oneSongCategory$splitMark$oneSongIndexId");
+      encodedList.add(mapAsString);
     }
     return encodedList;
   }
@@ -149,13 +154,24 @@ class SongCubit extends Cubit<SongState> {
   List<Song> decode({required List<String> stringList}) {
     List<Song> decodedSongsList = [];
     for (final String stringAsSong in stringList) {
-      final List<String> splittedStringAsSong = stringAsSong.split(splitMark);
-      final String theCategory = splittedStringAsSong[0];
-      final int theIndexId = int.parse(splittedStringAsSong[1]);
-
-      final Song theSong = theList[theCategory]!.firstWhere(
-          (Song iteratedSong) => iteratedSong.indexId == theIndexId);
-      decodedSongsList.add(theSong);
+      // final List<String> splittedStringAsSong = stringAsSong.split(splitMark);
+      // final String theCategory = splittedStringAsSong[0];
+      // final int theIndexId = int.parse(splittedStringAsSong[1]);
+      //
+      // final Song theSong = theList[theCategory]!.firstWhere(
+      //     (Song iteratedSong) => iteratedSong.indexId == theIndexId);
+      // final Song takenSong = json.decode(stringAsSong);
+      var mapAsSong = json.decode(stringAsSong);
+      // final Song takenSong = Song.fromJson(mapAsSong);
+      // var takenMap = json.decode(source)
+      // decodedSongsList.add(theSong);
+      final Song takenSong = Song(
+          title: mapAsSong["title"],
+          imgPath: mapAsSong["imgPath"],
+          duration: mapAsSong["duration"],
+          category: mapAsSong["category"],
+          indexId: int.parse(mapAsSong["indexId"]));
+      decodedSongsList.add(takenSong);
     }
     return decodedSongsList;
   }
@@ -186,16 +202,16 @@ class SongCubit extends Cubit<SongState> {
     final int previousSongId = currentSongId - 1;
     // final int theCategoryOfTheSongsLength = theList[currentSongCategory]!.length;
     // final int currentSongComparisonDistance = currentSongId - 1;
-
-    if (previousSongId < 0) {
-      return null;
-    } else {
-      print(previousSongId);
-      final Song previousSong =
-          theList[currentSongCategory]!.elementAt(previousSongId);
-      currentSong = previousSong;
-      return previousSong;
-    }
+    if (category != "Favorilerim") {
+      if (previousSongId < 0) {
+        return null;
+      } else {
+        final Song previousSong =
+            theList[currentSongCategory]!.elementAt(previousSongId);
+        currentSong = previousSong;
+        return previousSong;
+      }
+    } else {}
   }
 
 // favorite songs

@@ -1,6 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ninni_1/cubit/song_cubit/song_cubit.dart';
 import 'package:ninni_1/index.dart';
 
 enum PageTransitionType {
@@ -16,8 +17,20 @@ enum PageTransitionType {
   leftToRightWithFade,
 }
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<SongCubit>().loadTheFavorites();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,13 +1,9 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ninni_1/cubit/audio_player/audio_player_cubit.dart';
 import 'package:ninni_1/cubit/song_cubit/song_cubit.dart';
-import 'package:ninni_1/index.dart';
 import 'package:ninni_1/splash_screen.dart';
-
-import 'music_player_screen.dart';
 
 void main() => runApp(App());
 
