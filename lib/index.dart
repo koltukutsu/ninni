@@ -20,13 +20,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     initListSong();
+    context.read<SongCubit>().loadTheFavorites();
     super.initState();
   }
-  void refreshFunction(){
+
+  void refreshFunction() {
     setState(() {
       listSong;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     var mediaQuery = MediaQuery.of(context);
@@ -237,23 +240,33 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Padding(
         padding: EdgeInsets.only(
           top: mediaQuery.size.height * 0.15,
-          right: 32.0,
+          right: 2.0,
         ),
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FloatingActionButton(
-                backgroundColor: context.read<SongCubit>().category == "Ninniler"
-                    ? const Color(0xFF7D9AFF)
-                    : Colors.cyan,
+              padding: const EdgeInsets.all(2.0),
+              child: FloatingActionButton.extended(
+                backgroundColor:
+                    context.read<SongCubit>().category == "Ninniler"
+                        ? const Color(0xFF7D9AFF)
+                        : Colors.cyan,
                 onPressed: () {
-                  context.read<SongCubit>().setCategory(userCategory: "Ninniler");
+                  context
+                      .read<SongCubit>()
+                      .setCategory(userCategory: "Ninniler");
                   setState(() {
                     listSong = context.read<SongCubit>().theList["Ninniler"]!;
                   });
                 },
-                child: const Icon(
+                // isExtended: context.read<SongCubit>().category == "Ninniler",
+
+                label: Text("Ninniler",
+                    style: TextStyle(
+                        color: context.read<SongCubit>().category == "Ninniler"
+                            ? Colors.white70
+                            : Colors.black)),
+                icon: const Icon(
                   Icons.width_normal_outlined,
                   color: Colors.white,
                 ),
@@ -261,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: FloatingActionButton(
+              child: FloatingActionButton.extended(
                 backgroundColor:
                     context.read<SongCubit>().category == "Eğlenceli Şarkılar"
                         ? const Color(0xFF7D9AFF)
@@ -276,7 +289,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         .theList["Eğlenceli Şarkılar"]!;
                   });
                 },
-                child: const Icon(
+                // isExtended: context.read<SongCubit>().category == "Eğlenceli Şarkılar",
+                label: Text(
+                  "Eğlenceli Şarkılar",
+                  style: TextStyle(
+                      color: context.read<SongCubit>().category ==
+                              "Eğlenceli Şarkılar"
+                          ? Colors.white70
+                          : Colors.black),
+                ),
+                icon: const Icon(
                   Icons.add_alert,
                   color: Colors.white,
                 ),
@@ -284,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: FloatingActionButton(
+              child: FloatingActionButton.extended(
                 backgroundColor:
                     context.read<SongCubit>().category == "Beyaz Gürültüler"
                         ? const Color(0xFF7D9AFF)
@@ -294,10 +316,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       .read<SongCubit>()
                       .setCategory(userCategory: "Beyaz Gürültüler");
                   setState(() {
-                    listSong = context.read<SongCubit>().theList["Beyaz Gürültüler"]!;
+                    listSong =
+                        context.read<SongCubit>().theList["Beyaz Gürültüler"]!;
                   });
                 },
-                child: const Icon(
+                // isExtended: context.read<SongCubit>().category == "Beyaz Gürültüler",
+                label: Text(
+                  "Beyaz Gürültüler",
+                  style: TextStyle(
+                      color: context.read<SongCubit>().category ==
+                              "Beyaz Gürültüler"
+                          ? Colors.white70
+                          : Colors.black),
+                ),
+                icon: const Icon(
                   Icons.ac_unit,
                   color: Colors.white,
                 ),
@@ -305,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: FloatingActionButton(
+              child: FloatingActionButton.extended(
                 backgroundColor:
                     context.read<SongCubit>().category == "Favorilerim"
                         ? const Color(0xFF7D9AFF)
@@ -315,10 +347,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       .read<SongCubit>()
                       .setCategory(userCategory: "Favorilerim");
                   setState(() {
-                    listSong = context.read<SongCubit>().theList["Favorilerim"]!;
+                    listSong =
+                        context.read<SongCubit>().theList["Favorilerim"]!;
                   });
                 },
-                child: const Icon(
+                label: Text(
+                  "Favorilerim",
+                  style: TextStyle(
+                      color: context.read<SongCubit>().category == "Favorilerim"
+                          ? Colors.white70
+                          : Colors.black),
+                ),
+                // isExtended: context.read<SongCubit>().category == "Favorilerim",
+                icon: const Icon(
                   Icons.favorite_border_outlined,
                   color: Colors.white,
                 ),
@@ -391,56 +432,61 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void initListSong() {
-    listSong.add(Song(
-        title: "Atem Tutem Men Seni",
-        duration: "03:18",
-        imgPath: AppPaths.atemTutemBenSeniImage,
-        urlPath: AppPaths.atemTutemBenSeni));
-    listSong.add(Song(
-        title: "Rengarenk Düşlerdesin",
-        duration: "03:11",
-        imgPath: AppPaths.rengarenkDuslerdesinImage,
-        urlPath: AppPaths.rengarenkDuslerdesin));
-    listSong.add(Song(
-        title: "Yum Gözlerini Yum",
-        imgPath: AppPaths.yumGozleriniYumImage,
-        duration: "02:20",
-        urlPath: AppPaths.yumGozleriniYum));
-    listSong.add(Song(
-        title: "Fış Fış Kayıkçı",
-        imgPath: AppPaths.fisFisKayikciImage,
-        duration: "02:21",
-        urlPath: AppPaths.fisFisKayikci));
-    listSong.add(Song(
-        title: "Annesi Onu Çok Severmiş",
-        duration: "02:36",
-        imgPath: AppPaths.annesiOnuCokSevermisImage,
-        urlPath: AppPaths.annesiOnuCokSevermis));
-    listSong.add(Song(
-        title: "Kırmızı Balık Gölde",
-        imgPath: AppPaths.kirmiziBalikGoldeImage,
-        duration: "01:19",
-        urlPath: AppPaths.kirmiziBalikGolde));
-    listSong.add(Song(
-        title: "Meyveler Şarkısı",
-        duration: "02:34",
-        imgPath: AppPaths.meyvelerImage,
-        urlPath: AppPaths.meyveler));
-    listSong.add(Song(
-        title: "Portakalı Soydum",
-        duration: "01:22",
-        imgPath: AppPaths.portakaliSoydumImage,
-        urlPath: AppPaths.portakaliSoydum));
-    listSong.add(Song(
-        title: "Uyusunda Büyüsün - Dandini Dandini Dastana",
-        duration: "04:35",
-        imgPath: AppPaths.uyusundaBuyusunDandiniImage,
-        urlPath: AppPaths.uyusundaBuyusunDandini));
-    listSong.add(Song(
-        title: "Uyusunda Büyüsün",
-        duration: "03:00",
-        urlPath: AppPaths.uyusundaBuyusun,
-        imgPath: AppPaths.uyusundaBuyusunImage));
+    final List<Song> theInitialSongs =
+        context.read<SongCubit>().theList["Ninniler"]!;
+    setState(() {
+      listSong.addAll(theInitialSongs);
+    });
+    // listSong.add(Song(
+    //     title: "Atem Tutem Men Seni",
+    //     duration: "03:18",
+    //     imgPath: AppPaths.atemTutemBenSeniImage,
+    //     urlPath: AppPaths.atemTutemBenSeni));
+    // listSong.add(Song(
+    //     title: "Rengarenk Düşlerdesin",
+    //     duration: "03:11",
+    //     imgPath: AppPaths.rengarenkDuslerdesinImage,
+    //     urlPath: AppPaths.rengarenkDuslerdesin));
+    // listSong.add(Song(
+    //     title: "Yum Gözlerini Yum",
+    //     imgPath: AppPaths.yumGozleriniYumImage,
+    //     duration: "02:20",
+    //     urlPath: AppPaths.yumGozleriniYum));
+    // listSong.add(Song(
+    //     title: "Fış Fış Kayıkçı",
+    //     imgPath: AppPaths.fisFisKayikciImage,
+    //     duration: "02:21",
+    //     urlPath: AppPaths.fisFisKayikci));
+    // listSong.add(Song(
+    //     title: "Annesi Onu Çok Severmiş",
+    //     duration: "02:36",
+    //     imgPath: AppPaths.annesiOnuCokSevermisImage,
+    //     urlPath: AppPaths.annesiOnuCokSevermis));
+    // listSong.add(Song(
+    //     title: "Kırmızı Balık Gölde",
+    //     imgPath: AppPaths.kirmiziBalikGoldeImage,
+    //     duration: "01:19",
+    //     urlPath: AppPaths.kirmiziBalikGolde));
+    // listSong.add(Song(
+    //     title: "Meyveler Şarkısı",
+    //     duration: "02:34",
+    //     imgPath: AppPaths.meyvelerImage,
+    //     urlPath: AppPaths.meyveler));
+    // listSong.add(Song(
+    //     title: "Portakalı Soydum",
+    //     duration: "01:22",
+    //     imgPath: AppPaths.portakaliSoydumImage,
+    //     urlPath: AppPaths.portakaliSoydum));
+    // listSong.add(Song(
+    //     title: "Uyusunda Büyüsün - Dandini Dandini Dastana",
+    //     duration: "04:35",
+    //     imgPath: AppPaths.uyusundaBuyusunDandiniImage,
+    //     urlPath: AppPaths.uyusundaBuyusunDandini));
+    // listSong.add(Song(
+    //     title: "Uyusunda Büyüsün",
+    //     duration: "03:00",
+    //     urlPath: AppPaths.uyusundaBuyusun,
+    //     imgPath: AppPaths.uyusundaBuyusunImage));
   }
 }
 
@@ -449,11 +495,15 @@ class Song {
   final String duration;
   final String urlPath;
   final String imgPath;
+  final String category;
+  final int indexId;
 
   Song(
       {required this.title,
       required this.imgPath,
       required this.duration,
+      required this.category,
+      required this.indexId,
       this.urlPath = "assets/"});
 
   @override

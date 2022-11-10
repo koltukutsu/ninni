@@ -234,7 +234,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                                   theSongFav.title == widget.title,
                             ) !=
                         -1;
-                    print(isFavorited);
+
                     if (isFavorited) {
                       final Song theCurrentSong =
                           context.read<SongCubit>().currentSong;
@@ -250,7 +250,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                           .theList["Favorilerim"]!
                           .add(theCurrentSong);
                     }
-
+                    widget.refreshFunction();
+                    context.read<SongCubit>().saveTheFavorites();
                     setState(() {});
                   },
                   icon: context
