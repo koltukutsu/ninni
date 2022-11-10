@@ -40,11 +40,14 @@ dependencies:
   audioplayers: ^1.1.1
   flutter_bloc: ^8.1.1
   shared_preferences: ^2.0.15
+  flutter_app_name: ^0.1.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+flutter_app_name:
+  name: "Moi"
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

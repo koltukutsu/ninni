@@ -8,22 +8,22 @@ import 'package:ninni_1/cubit/song_cubit/song_cubit.dart';
 import 'package:ninni_1/index.dart';
 
 class MusicPlayerScreen extends StatefulWidget {
-  final String title;
+  String? title;
   final String urlPath;
   final String author;
   final int index;
-  final String duration;
-  final String imgPath;
+  String? duration;
+  String? imgPath;
   final VoidCallback refreshFunction;
 
-  const MusicPlayerScreen({super.key,
+  MusicPlayerScreen({super.key,
     required this.urlPath,
     required this.refreshFunction,
     required this.author,
-    required this.title,
+    this.title,
     required this.index,
-    required this.imgPath,
-    required this.duration});
+    this.imgPath,
+    this.duration});
 
   @override
   _MusicPlayerScreenState createState() => _MusicPlayerScreenState();
@@ -40,16 +40,16 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print(widget.urlPath);
-    startFunction();
+    startFunction(urlPath: widget.urlPath, index: widget.index);
   }
 
-  Future<void> startFunction() async {
+  Future<void> startFunction(
+      {required String urlPath, required int index}) async {
     // context.read<AudioPlayerCubit>().resetAudioPlayer();
 
     await context
         .read<AudioPlayerCubit>()
-        .setAudioAndPlay(path: widget.urlPath, index: widget.index);
+        .setAudioAndPlay(path: urlPath, index: index);
 
     // context.read<AudioPlayerCubit>().resumeAudio();
     if (!mounted) return;
@@ -81,7 +81,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       });
       if (durationInSeconds == positionInSeconds) {
         setState(() {
-          _replayCrossFadeState = CrossFadeState.showSecond;
+          _crossFadeState = CrossFadeState.showSecond;
         });
       }
     });
@@ -166,7 +166,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               child: IconButton(
                   onPressed: () {
                     context.read<AudioPlayerCubit>().stopAudio();
-                    startFunction();
+                    startFunction(urlPath: widget.urlPath, index: widget.index);
                     setState(() {
                       _crossFadeState = CrossFadeState.showFirst;
                     });
@@ -175,7 +175,39 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             ),
             Expanded(
               child: IconButton(
-                  onPressed: () {}, icon: const Icon(Icons.fast_rewind)),
+                  onPressed: () {
+                    final Song? previousSong =
+                    context.read<SongCubit>().getPreviousSong();
+                    if (previousSong != null) {
+                      startFunction(
+                          urlPath: previousSong.urlPath,
+                          index: previousSong.indexId);
+                      setState(() {
+                        widget.title = previousSong.title;
+                        widget.imgPath = previousSong.imgPath;
+                        widget.duration = previousSong.duration;
+                        _crossFadeState = CrossFadeState.showFirst;
+                      });
+                      // Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      //     builder: (BuildContext context) => MusicPlayerScreen(
+                      //           index: previousSong.indexId,
+                      //           title: previousSong.title,
+                      //           refreshFunction: widget.refreshFunction,
+                      //           imgPath: previousSong.imgPath,
+                      //           urlPath: previousSong.urlPath,
+                      //           author: "Ninniler",
+                      //           duration: previousSong.duration,
+                      //         )));
+                    } else {
+                      // print("bitti previous song");
+                      _showDialog(
+                          context, const Color(0xFF33609B),
+                          "Listenin başına geldin",
+                          textColor: const Color(0xFF33609B),
+                          icon: Icons.error);
+                    }
+                  },
+                  icon: const Icon(Icons.fast_rewind)),
             ),
             Container(
               decoration: BoxDecoration(
@@ -224,21 +256,38 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             Expanded(
               child: IconButton(
                   onPressed: () {
-                    final Song nextSong =; // TODO: duzelt
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (BuildContext context) =>
-                            MusicPlayerScreen(
-                              index: nextSong.indexId,
-                              title: nextSong.title,
-                              refreshFunction: widget.refreshFunction,
-                              imgPath: nextSong.imgPath,
-                              urlPath: nextSong.urlPath,
-                              author
-                                  : "Ninniler",
-                              duration
-                                  : nextSong.duration,))
-                    );
-                  }, icon: const Icon(Icons.fast_forward)),
+                    final Song? nextSong =
+                    context.read<SongCubit>().getNextSong();
+                    if (nextSong != null) {
+                      print("icerde next song");
+                      startFunction(
+                          urlPath: nextSong.urlPath, index: nextSong.indexId);
+                      setState(() {
+                        widget.title = nextSong.title;
+                        widget.imgPath = nextSong.imgPath;
+                        widget.duration = nextSong.duration;
+                        _crossFadeState = CrossFadeState.showFirst;
+                      });
+                      // Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      //     builder: (BuildContext context) => MusicPlayerScreen(
+                      //           index: nextSong.indexId,
+                      //           title: nextSong.title,
+                      //           refreshFunction: widget.refreshFunction,
+                      //           imgPath: nextSong.imgPath,
+                      //           urlPath: nextSong.urlPath,
+                      //           author: "Ninniler",
+                      //           duration: nextSong.duration,
+                      //         )));
+                    } else {
+                      // print("bitti next song");
+                      _showDialog(
+                          context, const Color(0xFF33609B),
+                          "Listenin sonuna geldin",
+                          textColor: const Color(0xFF33609B),
+                          icon: Icons.error);
+                    }
+                  },
+                  icon: const Icon(Icons.fast_forward)),
             ),
             Expanded(
               child: IconButton(
@@ -261,15 +310,23 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                           .read<SongCubit>()
                           .theList["Favorilerim"]!
                           .remove(theCurrentSong);
+                      context.read<SongCubit>().reindexFavoriteSongs();
+
                     } else {
                       final Song theCurrentSong =
                           context
                               .read<SongCubit>()
                               .currentSong;
+                      final int addedSongIndex = context.read<SongCubit>().theList["Favorilerim"]!.length;
+                      final Song addedSong = Song(title: theCurrentSong.title,
+                          imgPath: theCurrentSong.imgPath,
+                          duration: theCurrentSong.duration,
+                          category: "Favorilerim",
+                          indexId: addedSongIndex);
                       context
                           .read<SongCubit>()
                           .theList["Favorilerim"]!
-                          .add(theCurrentSong);
+                          .add(addedSong);
                     }
                     widget.refreshFunction();
                     context.read<SongCubit>().saveTheFavorites();
@@ -299,7 +356,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            widget.title,
+            widget.title!,
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontFamily: "Campton_Light",
@@ -310,7 +367,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           ),
           const SizedBox(height: 4.0),
           const Text(
-            "Ninni",
+            "", // Asagidaki yazi
             style: TextStyle(
               fontFamily: "Campton_Light",
               color: Color(0xFF7D9AFF),
@@ -335,7 +392,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           ),
         ),
         Text(
-          widget.duration,
+          widget.duration!,
           style: const TextStyle(
             color: Colors.grey,
             fontSize: 16.0,
@@ -372,6 +429,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       min: 0,
       max: durationInSeconds.toDouble(),
       value: positionInSeconds.toDouble(),
+
       onChanged: (value) async {
         final position = Duration(seconds: value.toInt());
         await context
@@ -428,9 +486,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               color: Colors.white,
             ),
           ),
-          const Text(
-            "Ninniler",
-            style: TextStyle(
+          Text(
+            // "Ninniler",
+            context
+                .read<SongCubit>()
+                .category,
+            style: const TextStyle(
               color: Colors.white,
               fontFamily: "Campton_Light",
               fontWeight: FontWeight.w900,
@@ -470,4 +531,24 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       ),
     );
   }
+}
+
+_showDialog(BuildContext context, Color color, String text,
+    {required Color textColor, IconData icon = Icons.verified}) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: Colors.white70,
+    behavior: SnackBarBehavior.floating,
+    content: Row(
+      children: [
+        Icon(
+          icon,
+          color: color,
+        ),
+        const SizedBox(
+          width: 25,
+        ),
+        Text(text, style: TextStyle(color: textColor)),
+      ],
+    ),
+  ));
 }

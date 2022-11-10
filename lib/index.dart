@@ -25,9 +25,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void refreshFunction() {
-    setState(() {
-      listSong;
-    });
+    if (context.read<SongCubit>().category == "Favorilerim") {
+      setState(() {
+        listSong = context.read<SongCubit>().theList["Favorilerim"]!;
+      });
+    } else {
+      setState(() {
+        listSong;
+      });
+    }
   }
 
   @override
@@ -42,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // _buildWidgetActionAppBar(mediaQuery),
           _buildWidgetArtistName(mediaQuery),
           _buildWidgetCategory(mediaQuery),
-          // _buildWidgetFloatingActionButton(mediaQuery),
+          _buildWidgetFloatingActionButton(mediaQuery),
           _buildWidgetListSong(mediaQuery),
         ],
       ),
@@ -210,6 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
           right: 32.0,
         ),
         child: FloatingActionButton(
+          heroTag: "Random_btn",
           backgroundColor: const Color(0xFF7D9AFF),
           onPressed: () {
             final randomSeedForSong = Random();
@@ -247,6 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.all(4.0),
               child: FloatingActionButton.extended(
+                heroTag: "Ninniler_btn",
                 backgroundColor:
                     context.read<SongCubit>().category == "Ninniler"
                         ? const Color(0xFF7D9AFF)
@@ -275,6 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: FloatingActionButton.extended(
+                heroTag: "eglenceliSarkilar_btn",
                 backgroundColor:
                     context.read<SongCubit>().category == "Eğlenceli Şarkılar"
                         ? const Color(0xFF7D9AFF)
@@ -307,6 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: FloatingActionButton.extended(
+                heroTag: "beyazGurultuler_btn",
                 backgroundColor:
                     context.read<SongCubit>().category == "Beyaz Gürültüler"
                         ? const Color(0xFF7D9AFF)
@@ -338,6 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.all(4.0),
               child: FloatingActionButton.extended(
+                heroTag: "favoriler_btn",
                 backgroundColor:
                     context.read<SongCubit>().category == "Favorilerim"
                         ? const Color(0xFF7D9AFF)
@@ -496,7 +507,7 @@ class Song {
   final String urlPath;
   final String imgPath;
   final String category;
-  final int indexId;
+  int indexId;
 
   Song(
       {required this.title,

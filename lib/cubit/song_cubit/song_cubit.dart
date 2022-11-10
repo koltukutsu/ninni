@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 part "song_state.dart";
 
 class SongCubit extends Cubit<SongState> {
+  SongCubit() : super(IdleState());
   String category = "Ninniler";
   String splitMark = ",";
   Song currentSong = Song(
@@ -81,14 +82,14 @@ class SongCubit extends Cubit<SongState> {
           title: "Meyveler Şarkısı",
           duration: "02:34",
           category: "Ninniler",
-          indexId: 8,
+          indexId: 0,
           imgPath: AppPaths.meyvelerImage,
           urlPath: AppPaths.meyveler),
       Song(
           title: "Portakalı Soydum",
           duration: "01:22",
           category: "Ninniler",
-          indexId: 9,
+          indexId: 1,
           imgPath: AppPaths.portakaliSoydumImage,
           urlPath: AppPaths.portakaliSoydum)
     ],
@@ -96,8 +97,7 @@ class SongCubit extends Cubit<SongState> {
     "Favorilerim": []
   };
 
-  SongCubit() : super(IdleState());
-
+  // setting the category and the song for the main screen
   setCategory({required String userCategory}) {
     category = userCategory;
   }
@@ -107,11 +107,24 @@ class SongCubit extends Cubit<SongState> {
         .firstWhere((Song theSong) => theSong.title == userTitle);
   }
 
+  // favorite songs
+  reindexFavoriteSongs() {
+    final List<Song> favoriteSongsList = theList["Favorilerim"]!;
+    if (favoriteSongsList != []) {
+      int counterIndex = 0;
+      for (Song takenSong in favoriteSongsList) {
+        takenSong.indexId = counterIndex;
+        counterIndex++;
+      }
+    }
+  }
+
   loadTheFavorites() async {
     final prefs = await SharedPreferences.getInstance();
     final List<String>? songsAsStringList = prefs.getStringList('favorites');
     if (songsAsStringList != null) {
-      final List<Song> theFavoriteSongs = decode(stringList: songsAsStringList!);
+      final List<Song> theFavoriteSongs =
+          decode(stringList: songsAsStringList!);
       theList["Favorilerim"]!.addAll(theFavoriteSongs);
     }
   }
@@ -146,4 +159,44 @@ class SongCubit extends Cubit<SongState> {
     }
     return decodedSongsList;
   }
+
+  // getting the next and the previous song
+  Song? getNextSong() {
+    final int currentSongId = currentSong.indexId;
+    final String currentSongCategory = category;
+
+    final int theCategoryOfTheSongsLength =
+        theList[currentSongCategory]!.length;
+    final int currentSongComparisonDistance = currentSongId + 1;
+
+    if (currentSongComparisonDistance == theCategoryOfTheSongsLength) {
+      return null;
+    } else {
+      // final Song nextSong = theList[currentSongCategory]!.firstWhere((Song iteratedSong) => iteratedSong.indexId == nextSongId);
+      final int nextSongId = currentSongId + 1;
+      final Song nextSong = theList[currentSongCategory]!.elementAt(nextSongId);
+      currentSong = nextSong;
+      return nextSong;
+    }
+  }
+
+  Song? getPreviousSong() {
+    final int currentSongId = currentSong.indexId;
+    final String currentSongCategory = category;
+    final int previousSongId = currentSongId - 1;
+    // final int theCategoryOfTheSongsLength = theList[currentSongCategory]!.length;
+    // final int currentSongComparisonDistance = currentSongId - 1;
+
+    if (previousSongId < 0) {
+      return null;
+    } else {
+      print(previousSongId);
+      final Song previousSong =
+          theList[currentSongCategory]!.elementAt(previousSongId);
+      currentSong = previousSong;
+      return previousSong;
+    }
+  }
+
+// favorite songs
 }

@@ -26,5 +26,5 @@ class AppPaths {
   static const String portakaliSoydumImage = "photos/portakaliSoydum.jpg";
   static const String uyusundaBuyusunDandiniImage =
       "photos/uyusundaBuyusunDandini.jpg";
-  static const String uyusundaBuyusunImage = "photos/uyusundaBuyusun.jpg";
+  static const String uyusundaBuyusunImage = "photos/uyusundaBuyusun.jpeg";
 }
