@@ -245,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(2.0),
+              padding: const EdgeInsets.all(4.0),
               child: FloatingActionButton.extended(
                 backgroundColor:
                     context.read<SongCubit>().category == "Ninniler"
@@ -336,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(4.0),
               child: FloatingActionButton.extended(
                 backgroundColor:
                     context.read<SongCubit>().category == "Favorilerim"
