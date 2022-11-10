@@ -275,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? Colors.white70
                             : Colors.black)),
                 icon: const Icon(
-                  Icons.width_normal_outlined,
+                  Icons.bedtime,
                   color: Colors.white,
                 ),
               ),
@@ -308,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           : Colors.black),
                 ),
                 icon: const Icon(
-                  Icons.add_alert,
+                  Icons.bedroom_baby,
                   color: Colors.white,
                 ),
               ),
@@ -340,7 +340,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           : Colors.black),
                 ),
                 icon: const Icon(
-                  Icons.ac_unit,
+                  Icons.cruelty_free,
                   color: Colors.white,
                 ),
               ),

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ninni_1/cubit/audio_player/audio_player_cubit.dart';
 import 'package:ninni_1/cubit/song_cubit/song_cubit.dart';
 import 'package:ninni_1/index.dart';
+import 'package:ninni_1/splash_screen.dart';
 
 import 'music_player_screen.dart';
 
@@ -25,7 +26,7 @@ class App extends StatelessWidget {
           primaryColor: const Color(0xFF7D9AFF),
           accentColor: const Color(0xFF7D9AFF),
         ),
-        home: HomeScreen(),
+        home: SplashScreen(),
       ),
     );
   }
