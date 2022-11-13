@@ -63,7 +63,7 @@ flutter_app_name:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/final_original.png"
+  image_path: "assets/ninni_2_icon.jpeg"
   min_sdk_android: 16 # android min sdk min:16, default 21
 # The following section is specific to Flutter packages.
 flutter:

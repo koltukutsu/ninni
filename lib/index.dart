@@ -65,7 +65,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Positioned(
                   top: constraints.maxHeight - 220.0,
                   child: const Text(
-                    "Mooi",
+                    // "Mooi",
+                    "",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: "CoralPen",
@@ -433,7 +434,8 @@ class _HomeScreenState extends State<HomeScreen> {
           bottomLeft: Radius.circular(48.0),
         ),
         image: DecorationImage(
-          image: AssetImage("assets/photos/ninni_resim.png"),
+          // image: AssetImage("assets/photos/ninni_resim.png"),
+          image: AssetImage("assets/main.jpeg"),
           fit: BoxFit.cover,
         ),
       ),
@@ -530,12 +532,11 @@ class Song {
         urlPath = json['urlPath'];
 
   Map<String, dynamic> toJson() => {
-    'title': title,
-    'imgPath': imgPath,
-    'duration': duration,
-    'category': category,
-    'indexId': indexId,
-    'urlPath': urlPath,
-
-  };
+        'title': title,
+        'imgPath': imgPath,
+        'duration': duration,
+        'category': category,
+        'indexId': indexId,
+        'urlPath': urlPath,
+      };
 }
