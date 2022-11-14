@@ -38,18 +38,18 @@ class _SplashScreenState extends State<SplashScreen> {
       splash:
           Stack(fit: StackFit.expand, alignment: Alignment.center, children: [
             // Image.asset("assets/photos/ninni.jpg", fit: BoxFit.fitHeight),
-            Image.asset("assets/main.jpeg", fit: BoxFit.fitHeight),
-        Center(
-          child: const Text(
-            "Mooi",
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: "CoralPen",
-              fontSize: 220.0,
-
-            ),
-          ),
-        ),
+            Image.asset("assets/splash.png", fit: BoxFit.fitHeight),
+        // Center(
+        //   child: const Text(
+        //     "Mooi",
+        //     style: TextStyle(
+        //       color: Colors.white,
+        //       fontFamily: "CoralPen",
+        //       fontSize: 220.0,
+        //
+        //     ),
+        //   ),
+        // ),
       ]),
       splashIconSize: MediaQuery.of(context).size.longestSide,
       backgroundColor: Color(0xFF1C76AB),

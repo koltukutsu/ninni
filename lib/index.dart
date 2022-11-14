@@ -435,7 +435,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         image: DecorationImage(
           // image: AssetImage("assets/photos/ninni_resim.png"),
-          image: AssetImage("assets/main.jpeg"),
+          image: AssetImage("assets/index.png"),
           fit: BoxFit.cover,
         ),
       ),
