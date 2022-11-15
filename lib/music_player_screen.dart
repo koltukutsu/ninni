@@ -184,12 +184,21 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         setState(() {
           durationInSeconds = getDurationInSeconds;
         });
-      if (durationInSeconds == positionInSeconds) {
+      if ((positionInSeconds == durationInSeconds) && (!doesClicked)) {
+        print("DEGISIYIOR");
+        print("DEGISIYIOR");
+        print("DEGISIYIOR");
+        print("DEGISIYIOR");
+        print("DEGISIYIOR");
+        print("DEGISIYIOR");
+        print("DEGISIYIOR");
         if (mounted)
           setState(() {
             _crossFadeState = CrossFadeState.showSecond;
           });
-
+        Future.delayed(Duration(milliseconds: 300), () {
+          goToNextSong();
+        });
         // final Song? nextSong = context.read<SongCubit>().getNextSong();
         // if (nextSong != null) {
         //   startFunction(urlPath: nextSong.urlPath, index: nextSong.indexId);
@@ -527,18 +536,18 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     //   ),
     // );
     return Slider(
-      label: durationInSeconds.toString(),
+      label: position,
       min: 0,
       max: durationInSeconds.toDouble(),
       value: positionInSeconds.toDouble(),
+      divisions: 200,
       onChangeStart: (taken) {
         setState(() {
           doesClicked = true;
         });
       },
       onChangeEnd: (taken) {
-        setState((){
-
+        setState(() {
           doesClicked = false;
         });
 
@@ -548,8 +557,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           });
         }
       },
-
       onChanged: (value) async {
+        print(value.toInt());
         final position = Duration(seconds: value.toInt());
         await context.read<AudioPlayerCubit>().audioPlayer.seek(position);
         // can be changed to not resume
@@ -558,11 +567,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           await context.read<AudioPlayerCubit>().audioPlayer.resume();
         }
 
-        if ((position.inSeconds == durationInSeconds) && (!doesClicked)) {
-          Future.delayed(Duration(milliseconds: 300), () {
-            goToNextSong();
-          });
-        }
+        // if ((positionInSeconds == durationInSeconds) && (!doesClicked)) {
+        //   Future.delayed(Duration(milliseconds: 300), () {
+        //     goToNextSong();
+        //   });
+        // }
       },
     );
   }
