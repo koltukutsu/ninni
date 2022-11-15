@@ -31,6 +31,7 @@ class MusicPlayerScreen extends StatefulWidget {
 
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   CrossFadeState _crossFadeState = CrossFadeState.showFirst;
+
   // CrossFadeState _replayCrossFadeState = CrossFadeState.showFirst;
   String position = "00:00";
   int positionInSeconds = 0;
@@ -65,7 +66,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       if (hours > 0) {
         setState(() {
           position =
-          "${hours < 10 ? '0$hours' : hours}:${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10
+          "${hours < 10 ? '0$hours' : hours}:${minutes < 10
+              ? '0$minutes'
+              : minutes}:${seconds < 10
               ? '0$seconds'
               : seconds}";
           positionInSeconds = inSeconds;
@@ -79,7 +82,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           positionInSeconds = inSeconds;
         });
       }
-
     });
 
     context
@@ -318,15 +320,17 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                       context
                           .read<SongCubit>()
                           .theList["Favorilerim"]!
-                          .removeWhere((Song iteratedSong) => iteratedSong.title == theCurrentSong.title);
+                          .removeWhere((Song iteratedSong) =>
+                      iteratedSong.title == theCurrentSong.title);
                       context.read<SongCubit>().reindexFavoriteSongs();
-
                     } else {
                       final Song theCurrentSong =
                           context
                               .read<SongCubit>()
                               .currentSong;
-                      final int addedSongIndex = context.read<SongCubit>().theList["Favorilerim"]!.length;
+                      final int addedSongIndex = context
+                          .read<SongCubit>()
+                          .theList["Favorilerim"]!.length;
                       final Song addedSong = Song(title: theCurrentSong.title,
                           imgPath: theCurrentSong.imgPath,
                           duration: theCurrentSong.duration,

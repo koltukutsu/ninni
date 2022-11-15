@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
         // ),
       ]),
       splashIconSize: MediaQuery.of(context).size.longestSide,
-      backgroundColor: Color(0xFF1C76AB),
+      backgroundColor: Color(0xFF004AAD),
       // Container(
       //   height: MediaQuery.of(context).size.height,
       //   width: MediaQuery.of(context).size.width,
