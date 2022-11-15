@@ -61,13 +61,25 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       int inSeconds = newPosition.inSeconds;
       int seconds = newPosition.inSeconds % 60;
       int minutes = newPosition.inMinutes;
-      setState(() {
-        position =
-        "${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10
-            ? '0$seconds'
-            : seconds}";
-        positionInSeconds = inSeconds;
-      });
+      int hours = newPosition.inHours;
+      if (hours > 0) {
+        setState(() {
+          position =
+          "${hours < 10 ? '0$hours' : hours}:${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10
+              ? '0$seconds'
+              : seconds}";
+          positionInSeconds = inSeconds;
+        });
+      } else {
+        setState(() {
+          position =
+          "${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10
+              ? '0$seconds'
+              : seconds}";
+          positionInSeconds = inSeconds;
+        });
+      }
+
     });
 
     context

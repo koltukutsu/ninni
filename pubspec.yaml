@@ -79,8 +79,14 @@ flutter:
   #  - images/a_dot_ham.jpeg
   assets:
     - assets/
-    - assets/photos/
-    - assets/ninniler/
+    - assets/gorseller/
+    - assets/gorseller/beyaz_gurultu/
+    - assets/gorseller/eglenceli_sarkilar/
+    - assets/gorseller/ninniler/
+    - assets/sesler/
+    - assets/sesler/beyaz_gurultu/
+    - assets/sesler/eglenceli_sarkilar/
+    - assets/sesler/ninniler/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
