@@ -11,19 +11,20 @@ class MusicPlayerScreen extends StatefulWidget {
   String? title;
   final String urlPath;
   final String author;
-  final int index;
+  int index;
   String? duration;
   String? imgPath;
   final VoidCallback refreshFunction;
 
-  MusicPlayerScreen({super.key,
-    required this.urlPath,
-    required this.refreshFunction,
-    required this.author,
-    this.title,
-    required this.index,
-    this.imgPath,
-    this.duration});
+  MusicPlayerScreen(
+      {super.key,
+      required this.urlPath,
+      required this.refreshFunction,
+      required this.author,
+      this.title,
+      required this.index,
+      this.imgPath,
+      this.duration});
 
   @override
   _MusicPlayerScreenState createState() => _MusicPlayerScreenState();
@@ -36,6 +37,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   String position = "00:00";
   int positionInSeconds = 0;
   int durationInSeconds = 100;
+  int length = 0;
 
   @override
   void initState() {
@@ -51,6 +53,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     await context
         .read<AudioPlayerCubit>()
         .setAudioAndPlay(path: urlPath, index: index);
+    // int length = 0;
+    setState(() {
+      length = context
+          .read<SongCubit>()
+          .theList[context.read<SongCubit>().category]!
+          .length;
+    });
 
     // context.read<AudioPlayerCubit>().resumeAudio();
     if (!mounted) return;
@@ -66,19 +75,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       if (hours > 0) {
         setState(() {
           position =
-          "${hours < 10 ? '0$hours' : hours}:${minutes < 10
-              ? '0$minutes'
-              : minutes}:${seconds < 10
-              ? '0$seconds'
-              : seconds}";
+              "${hours < 10 ? '0$hours' : hours}:${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10 ? '0$seconds' : seconds}";
           positionInSeconds = inSeconds;
         });
       } else {
         setState(() {
           position =
-          "${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10
-              ? '0$seconds'
-              : seconds}";
+              "${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10 ? '0$seconds' : seconds}";
           positionInSeconds = inSeconds;
         });
       }
@@ -191,7 +194,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               child: IconButton(
                   onPressed: () {
                     final Song? previousSong =
-                    context.read<SongCubit>().getPreviousSong();
+                        context.read<SongCubit>().getPreviousSong();
                     if (previousSong != null) {
                       startFunction(
                           urlPath: previousSong.urlPath,
@@ -201,6 +204,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                         widget.imgPath = previousSong.imgPath;
                         widget.duration = previousSong.duration;
                         _crossFadeState = CrossFadeState.showFirst;
+                        widget.index = previousSong.indexId;
                       });
                       // Navigator.of(context).pushReplacement(MaterialPageRoute(
                       //     builder: (BuildContext context) => MusicPlayerScreen(
@@ -213,11 +217,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                       //           duration: previousSong.duration,
                       //         )));
                     } else {
-                      _showDialog(
-                          context, const Color(0xFF33609B),
-                          "Listenin başına geldin",
-                          textColor: const Color(0xFF33609B),
-                          icon: Icons.error);
+                      // _showDialog(
+                      //     context, const Color(0xFF33609B),
+                      //     "Listenin başına geldin",
+                      //     textColor: const Color(0xFF33609B),
+                      //     icon: Icons.error);
                     }
                   },
                   icon: const Icon(Icons.fast_rewind)),
@@ -270,7 +274,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               child: IconButton(
                   onPressed: () {
                     final Song? nextSong =
-                    context.read<SongCubit>().getNextSong();
+                        context.read<SongCubit>().getNextSong();
                     if (nextSong != null) {
                       startFunction(
                           urlPath: nextSong.urlPath, index: nextSong.indexId);
@@ -279,6 +283,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                         widget.imgPath = nextSong.imgPath;
                         widget.duration = nextSong.duration;
                         _crossFadeState = CrossFadeState.showFirst;
+                        widget.index = nextSong.indexId;
                       });
                       // Navigator.of(context).pushReplacement(MaterialPageRoute(
                       //     builder: (BuildContext context) => MusicPlayerScreen(
@@ -291,11 +296,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                       //           duration: nextSong.duration,
                       //         )));
                     } else {
-                      _showDialog(
-                          context, const Color(0xFF33609B),
-                          "Listenin sonuna geldin",
-                          textColor: const Color(0xFF33609B),
-                          icon: Icons.error);
+                      // _showDialog(
+                      //     context, const Color(0xFF33609B),
+                      //     "Listenin sonuna geldin",
+                      //     textColor: const Color(0xFF33609B),
+                      //     icon: Icons.error);
                     }
                   },
                   icon: const Icon(Icons.fast_forward)),
@@ -304,34 +309,32 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               child: IconButton(
                   onPressed: () {
                     final bool isFavorited = context
-                        .read<SongCubit>()
-                        .theList["Favorilerim"]!
-                        .indexWhere(
-                          (Song theSongFav) =>
-                      theSongFav.title == widget.title,
-                    ) !=
+                            .read<SongCubit>()
+                            .theList["Favorilerim"]!
+                            .indexWhere(
+                              (Song theSongFav) =>
+                                  theSongFav.title == widget.title,
+                            ) !=
                         -1;
 
                     if (isFavorited) {
                       final Song theCurrentSong =
-                          context
-                              .read<SongCubit>()
-                              .currentSong;
+                          context.read<SongCubit>().currentSong;
                       context
                           .read<SongCubit>()
                           .theList["Favorilerim"]!
                           .removeWhere((Song iteratedSong) =>
-                      iteratedSong.title == theCurrentSong.title);
+                              iteratedSong.title == theCurrentSong.title);
                       context.read<SongCubit>().reindexFavoriteSongs();
                     } else {
                       final Song theCurrentSong =
-                          context
-                              .read<SongCubit>()
-                              .currentSong;
+                          context.read<SongCubit>().currentSong;
                       final int addedSongIndex = context
                           .read<SongCubit>()
-                          .theList["Favorilerim"]!.length;
-                      final Song addedSong = Song(title: theCurrentSong.title,
+                          .theList["Favorilerim"]!
+                          .length;
+                      final Song addedSong = Song(
+                          title: theCurrentSong.title,
                           imgPath: theCurrentSong.imgPath,
                           duration: theCurrentSong.duration,
                           category: "Favorilerim",
@@ -346,13 +349,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                     setState(() {});
                   },
                   icon: context
-                      .read<SongCubit>()
-                      .theList["Favorilerim"]!
-                      .indexWhere(
-                        (Song theSongFav) =>
-                    theSongFav.title == widget.title,
-                  ) ==
-                      -1
+                              .read<SongCubit>()
+                              .theList["Favorilerim"]!
+                              .indexWhere(
+                                (Song theSongFav) =>
+                                    theSongFav.title == widget.title,
+                              ) ==
+                          -1
                       ? const Icon(Icons.favorite_border)
                       : const Icon(Icons.favorite)),
             ),
@@ -368,15 +371,29 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(
-            widget.title!,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontFamily: "Campton_Light",
-              fontSize: 25.0,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          Column(
+            children: [
+              Text(
+                widget.title!,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontFamily: "Campton_Light",
+                  fontSize: 25.0,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                "${(widget.index + 1).toString()}/${length}",
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontFamily: "Campton_Light",
+                  fontSize: 25.0,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
           const SizedBox(height: 4.0),
           const Text(
@@ -442,20 +459,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       min: 0,
       max: durationInSeconds.toDouble(),
       value: positionInSeconds.toDouble(),
-
       onChanged: (value) async {
         final position = Duration(seconds: value.toInt());
-        await context
-            .read<AudioPlayerCubit>()
-            .audioPlayer
-            .seek(position);
+        await context.read<AudioPlayerCubit>().audioPlayer.seek(position);
         // can be changed to not resume
         if (!mounted) return;
         if (_crossFadeState == CrossFadeState.showFirst) {
-          await context
-              .read<AudioPlayerCubit>()
-              .audioPlayer
-              .resume();
+          await context.read<AudioPlayerCubit>().audioPlayer.resume();
         }
       },
     );
@@ -501,9 +511,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           ),
           Text(
             // "Ninniler",
-            context
-                .read<SongCubit>()
-                .category,
+            context.read<SongCubit>().category,
             style: const TextStyle(
               color: Colors.white,
               fontFamily: "Campton_Light",
