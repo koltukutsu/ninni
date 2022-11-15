@@ -558,7 +558,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           await context.read<AudioPlayerCubit>().audioPlayer.resume();
         }
 
-        if ((position == durationInSeconds) && (!doesClicked)) {
+        if ((position.inSeconds == durationInSeconds) && (!doesClicked)) {
           Future.delayed(Duration(milliseconds: 300), () {
             goToNextSong();
           });
