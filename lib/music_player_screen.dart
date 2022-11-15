@@ -39,6 +39,90 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   int durationInSeconds = 100;
   int length = 0;
 
+  bool doesClicked = false;
+
+  Future<void> goToNextSong() async {
+    final Song? nextSong = context.read<SongCubit>().getNextSong();
+    if (nextSong != null) {
+      startFunction(urlPath: nextSong.urlPath, index: nextSong.indexId);
+      if (mounted)
+        setState(() {
+          widget.title = nextSong.title;
+          widget.imgPath = nextSong.imgPath;
+          widget.duration = nextSong.duration;
+          _crossFadeState = CrossFadeState.showFirst;
+          widget.index = nextSong.indexId;
+        });
+    } else {}
+  }
+
+  // Future<void> goToNextSong() async {
+  //   final Song? nextSong = context.read<SongCubit>().getNextSong();
+  //   if (nextSong != null) {
+  //     try {
+  //       startFunction(urlPath: nextSong.urlPath, index: nextSong.indexId);
+  //       if (mounted)
+  //         setState(() {
+  //           widget.title = nextSong.title;
+  //           widget.imgPath = nextSong.imgPath;
+  //           widget.duration = nextSong.duration;
+  //           _crossFadeState = CrossFadeState.showFirst;
+  //           widget.index = nextSong.indexId;
+  //         });
+  //     } catch (e) {
+  //       Future.delayed(Duration(milliseconds: 150), () {
+  //         goToNextSong();
+  //       });
+  //     }
+  //   } else {}
+  // }
+
+  Future<void> getToPrevious() async {
+    final Song? previousSong = context.read<SongCubit>().getPreviousSong();
+    if (previousSong != null) {
+      startFunction(urlPath: previousSong.urlPath, index: previousSong.indexId);
+      if (mounted)
+        setState(() {
+          widget.title = previousSong.title;
+          widget.imgPath = previousSong.imgPath;
+          widget.duration = previousSong.duration;
+          _crossFadeState = CrossFadeState.showFirst;
+          widget.index = previousSong.indexId;
+        });
+    } else {}
+  }
+
+  // Future<void> getToPrevious() async {
+  //   final Song? previousSong = context.read<SongCubit>().getPreviousSong();
+  //   if (previousSong != null) {
+  //     startFunction(urlPath: previousSong.urlPath, index: previousSong.indexId);
+  //     if (mounted)
+  //       setState(() {
+  //         widget.title = previousSong.title;
+  //         widget.imgPath = previousSong.imgPath;
+  //         widget.duration = previousSong.duration;
+  //         _crossFadeState = CrossFadeState.showFirst;
+  //         widget.index = previousSong.indexId;
+  //       });
+  //     try {
+  //       startFunction(
+  //           urlPath: previousSong.urlPath, index: previousSong.indexId);
+  //       if (mounted)
+  //         setState(() {
+  //           widget.title = previousSong.title;
+  //           widget.imgPath = previousSong.imgPath;
+  //           widget.duration = previousSong.duration;
+  //           _crossFadeState = CrossFadeState.showFirst;
+  //           widget.index = previousSong.indexId;
+  //         });
+  //     } catch (e) {
+  //       Future.delayed(Duration(milliseconds: 150), () {
+  //         getToPrevious();
+  //       });
+  //     }
+  //   } else {}
+  // }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -54,12 +138,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         .read<AudioPlayerCubit>()
         .setAudioAndPlay(path: urlPath, index: index);
     // int length = 0;
-    setState(() {
-      length = context
-          .read<SongCubit>()
-          .theList[context.read<SongCubit>().category]!
-          .length;
-    });
+    if (mounted)
+      setState(() {
+        length = context
+            .read<SongCubit>()
+            .theList[context.read<SongCubit>().category]!
+            .length;
+      });
 
     // context.read<AudioPlayerCubit>().resumeAudio();
     if (!mounted) return;
@@ -73,17 +158,19 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       int minutes = newPosition.inMinutes;
       int hours = newPosition.inHours;
       if (hours > 0) {
-        setState(() {
-          position =
-              "${hours < 10 ? '0$hours' : hours}:${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10 ? '0$seconds' : seconds}";
-          positionInSeconds = inSeconds;
-        });
+        if (mounted)
+          setState(() {
+            position =
+                "${hours < 10 ? '0$hours' : hours}:${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10 ? '0$seconds' : seconds}";
+            positionInSeconds = inSeconds;
+          });
       } else {
-        setState(() {
-          position =
-              "${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10 ? '0$seconds' : seconds}";
-          positionInSeconds = inSeconds;
-        });
+        if (mounted)
+          setState(() {
+            position =
+                "${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10 ? '0$seconds' : seconds}";
+            positionInSeconds = inSeconds;
+          });
       }
     });
 
@@ -93,13 +180,34 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         .onDurationChanged
         .listen((Duration newDuration) {
       final getDurationInSeconds = newDuration.inSeconds;
-      setState(() {
-        durationInSeconds = getDurationInSeconds;
-      });
-      if (durationInSeconds == positionInSeconds) {
+      if (mounted)
         setState(() {
-          _crossFadeState = CrossFadeState.showSecond;
+          durationInSeconds = getDurationInSeconds;
         });
+      if (durationInSeconds == positionInSeconds) {
+        if (mounted)
+          setState(() {
+            _crossFadeState = CrossFadeState.showSecond;
+          });
+
+        // final Song? nextSong = context.read<SongCubit>().getNextSong();
+        // if (nextSong != null) {
+        //   startFunction(urlPath: nextSong.urlPath, index: nextSong.indexId);
+        //   if (mounted)
+        //     setState(() {
+        //       widget.title = nextSong.title;
+        //       widget.imgPath = nextSong.imgPath;
+        //       widget.duration = nextSong.duration;
+        //       _crossFadeState = CrossFadeState.showFirst;
+        //       widget.index = nextSong.indexId;
+        //       positionInSeconds = 0;
+        //       durationInSeconds = 0;
+        //     });
+        // } else {}
+
+        // Future.delayed(Duration(milliseconds: 300), () {
+        //   goToNextSong();
+        // });
       }
     });
   }
@@ -184,45 +292,19 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                   onPressed: () {
                     context.read<AudioPlayerCubit>().stopAudio();
                     startFunction(urlPath: widget.urlPath, index: widget.index);
-                    setState(() {
-                      _crossFadeState = CrossFadeState.showFirst;
-                    });
+                    if (mounted)
+                      setState(() {
+                        _crossFadeState = CrossFadeState.showFirst;
+                      });
                   },
                   icon: const Icon(Icons.replay)),
             ),
             Expanded(
               child: IconButton(
                   onPressed: () {
-                    final Song? previousSong =
-                        context.read<SongCubit>().getPreviousSong();
-                    if (previousSong != null) {
-                      startFunction(
-                          urlPath: previousSong.urlPath,
-                          index: previousSong.indexId);
-                      setState(() {
-                        widget.title = previousSong.title;
-                        widget.imgPath = previousSong.imgPath;
-                        widget.duration = previousSong.duration;
-                        _crossFadeState = CrossFadeState.showFirst;
-                        widget.index = previousSong.indexId;
-                      });
-                      // Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      //     builder: (BuildContext context) => MusicPlayerScreen(
-                      //           index: previousSong.indexId,
-                      //           title: previousSong.title,
-                      //           refreshFunction: widget.refreshFunction,
-                      //           imgPath: previousSong.imgPath,
-                      //           urlPath: previousSong.urlPath,
-                      //           author: "Ninniler",
-                      //           duration: previousSong.duration,
-                      //         )));
-                    } else {
-                      // _showDialog(
-                      //     context, const Color(0xFF33609B),
-                      //     "Listenin başına geldin",
-                      //     textColor: const Color(0xFF33609B),
-                      //     icon: Icons.error);
-                    }
+                    Future.delayed(Duration(milliseconds: 350), () {
+                      getToPrevious();
+                    });
                   },
                   icon: const Icon(Icons.fast_rewind)),
             ),
@@ -234,21 +316,23 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(30.0),
+                padding: const EdgeInsets.all(15.0),
                 child: IconButton(
                   onPressed: () {
                     // if (_replayCrossFadeState == CrossFadeState.showFirst) {
                     if (_crossFadeState == CrossFadeState.showFirst) {
                       context.read<AudioPlayerCubit>().pauseAudio();
 
-                      setState(() {
-                        _crossFadeState = CrossFadeState.showSecond;
-                      });
+                      if (mounted)
+                        setState(() {
+                          _crossFadeState = CrossFadeState.showSecond;
+                        });
                     } else {
                       context.read<AudioPlayerCubit>().resumeAudio();
-                      setState(() {
-                        _crossFadeState = CrossFadeState.showFirst;
-                      });
+                      if (mounted)
+                        setState(() {
+                          _crossFadeState = CrossFadeState.showFirst;
+                        });
                     }
                     // }
                     // else {
@@ -273,35 +357,23 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             Expanded(
               child: IconButton(
                   onPressed: () {
-                    final Song? nextSong =
-                        context.read<SongCubit>().getNextSong();
-                    if (nextSong != null) {
-                      startFunction(
-                          urlPath: nextSong.urlPath, index: nextSong.indexId);
-                      setState(() {
-                        widget.title = nextSong.title;
-                        widget.imgPath = nextSong.imgPath;
-                        widget.duration = nextSong.duration;
-                        _crossFadeState = CrossFadeState.showFirst;
-                        widget.index = nextSong.indexId;
-                      });
-                      // Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      //     builder: (BuildContext context) => MusicPlayerScreen(
-                      //           index: nextSong.indexId,
-                      //           title: nextSong.title,
-                      //           refreshFunction: widget.refreshFunction,
-                      //           imgPath: nextSong.imgPath,
-                      //           urlPath: nextSong.urlPath,
-                      //           author: "Ninniler",
-                      //           duration: nextSong.duration,
-                      //         )));
-                    } else {
-                      // _showDialog(
-                      //     context, const Color(0xFF33609B),
-                      //     "Listenin sonuna geldin",
-                      //     textColor: const Color(0xFF33609B),
-                      //     icon: Icons.error);
-                    }
+                    Future.delayed(Duration(milliseconds: 350), () {
+                      goToNextSong();
+                    });
+                    // final Song? nextSong =
+                    //     context.read<SongCubit>().getNextSong();
+                    // if (nextSong != null) {
+                    //   startFunction(
+                    //       urlPath: nextSong.urlPath, index: nextSong.indexId);
+                    //   if (mounted)
+                    //     setState(() {
+                    //       widget.title = nextSong.title;
+                    //       widget.imgPath = nextSong.imgPath;
+                    //       widget.duration = nextSong.duration;
+                    //       _crossFadeState = CrossFadeState.showFirst;
+                    //       widget.index = nextSong.indexId;
+                    //     });
+                    // } else {}
                   },
                   icon: const Icon(Icons.fast_forward)),
             ),
@@ -346,7 +418,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                     }
                     widget.refreshFunction();
                     context.read<SongCubit>().saveTheFavorites();
-                    setState(() {});
+                    if (mounted) setState(() {});
                   },
                   icon: context
                               .read<SongCubit>()
@@ -459,6 +531,24 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       min: 0,
       max: durationInSeconds.toDouble(),
       value: positionInSeconds.toDouble(),
+      onChangeStart: (taken) {
+        setState(() {
+          doesClicked = true;
+        });
+      },
+      onChangeEnd: (taken) {
+        setState((){
+
+          doesClicked = false;
+        });
+
+        if ((positionInSeconds == durationInSeconds)) {
+          Future.delayed(Duration(milliseconds: 300), () {
+            goToNextSong();
+          });
+        }
+      },
+
       onChanged: (value) async {
         final position = Duration(seconds: value.toInt());
         await context.read<AudioPlayerCubit>().audioPlayer.seek(position);
@@ -466,6 +556,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         if (!mounted) return;
         if (_crossFadeState == CrossFadeState.showFirst) {
           await context.read<AudioPlayerCubit>().audioPlayer.resume();
+        }
+
+        if ((position == durationInSeconds) && (!doesClicked)) {
+          Future.delayed(Duration(milliseconds: 300), () {
+            goToNextSong();
+          });
         }
       },
     );
