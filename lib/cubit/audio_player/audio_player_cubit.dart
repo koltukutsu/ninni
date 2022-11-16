@@ -24,7 +24,7 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
     audioPlayer.setReleaseMode(ReleaseMode.stop);
     // audioPlayer.setSourceDeviceFile(path);
     // audioPlayer.setSourceAsset(path);
-
+    // if (path.split("assets/").length != 0)
     await audioPlayer.setSource(AssetSource(path));
     await audioPlayer.resume();
     // audioPlayer.

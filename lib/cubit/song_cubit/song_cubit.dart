@@ -290,6 +290,7 @@ class SongCubit extends Cubit<SongState> {
           imgPath: mapAsSong["imgPath"],
           duration: mapAsSong["duration"],
           category: mapAsSong["category"],
+          urlPath: mapAsSong["urlPath"],
           indexId: int.parse(mapAsSong["indexId"]));
       decodedSongsList.add(takenSong);
     }
@@ -322,7 +323,7 @@ class SongCubit extends Cubit<SongState> {
     final int previousSongId = currentSongId - 1;
     // final int theCategoryOfTheSongsLength = theList[currentSongCategory]!.length;
     // final int currentSongComparisonDistance = currentSongId - 1;
-    if (category != "Favorilerim") {
+    // if (category != "Favorilerim") {
       if (previousSongId < 0) {
         return null;
       } else {
@@ -331,7 +332,7 @@ class SongCubit extends Cubit<SongState> {
         currentSong = previousSong;
         return previousSong;
       }
-    } else {}
+    // } else {}
   }
 
 // favorite songs

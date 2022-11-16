@@ -81,7 +81,15 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           _crossFadeState = CrossFadeState.showFirst;
           widget.index = previousSong.indexId;
         });
-    } else {}
+    } else {
+      print("something happened");
+      print(context.read<SongCubit>().currentSong.indexId);
+      print(context.read<SongCubit>().currentSong.toString());
+
+      // for(Song taken in context.read<SongCubit>().theList["Favorilerim"]!) {
+      //   print(taken.toString());
+      // }
+    }
   }
 
   @override
@@ -108,7 +116,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       });
 
     // context.read<AudioPlayerCubit>().resumeAudio();
-
+    if(mounted) // TODO: control
     context
         .read<AudioPlayerCubit>()
         .audioPlayer
@@ -369,6 +377,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                           title: theCurrentSong.title,
                           imgPath: theCurrentSong.imgPath,
                           duration: theCurrentSong.duration,
+                          urlPath: theCurrentSong.urlPath,
                           category: "Favorilerim",
                           indexId: addedSongIndex);
                       context
@@ -504,12 +513,16 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           doesClicked = false;
         });
 
-        if ((positionInSeconds == durationInSeconds)) {
-          await Future.delayed(Duration(milliseconds: 400), () {
-            goToNextSong();
+        if ((positionInSeconds == durationInSeconds) & (flag == 0)) {
+          print("FIRST");
+          flag = 1;
+          Future.delayed(Duration(milliseconds: 400), () async {
+            await goToNextSong();
           });
         } else {
+          print("SECOND");
           await context.read<AudioPlayerCubit>().audioPlayer.resume();
+          await Timer(Duration(milliseconds: 400), (){});
           setState(() {
             _crossFadeState = CrossFadeState.showFirst;
           });
