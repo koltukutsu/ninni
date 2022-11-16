@@ -388,6 +388,8 @@ class _HomeScreenState extends State<HomeScreen> {
       required String duration,
       required String imgPath}) {
     context.read<SongCubit>().setSong(userTitle: title);
+    final String category = context.read<SongCubit>().category;
+    final int length = context.read<SongCubit>().theList[category]!.length;
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return MusicPlayerScreen(
         title: title,
@@ -397,6 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
         index: index,
         duration: duration,
         imgPath: imgPath,
+        length: length,
       );
     }));
   }

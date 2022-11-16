@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
@@ -15,6 +16,7 @@ class MusicPlayerScreen extends StatefulWidget {
   String? duration;
   String? imgPath;
   final VoidCallback refreshFunction;
+  int length;
 
   MusicPlayerScreen(
       {super.key,
@@ -22,6 +24,7 @@ class MusicPlayerScreen extends StatefulWidget {
       required this.refreshFunction,
       required this.author,
       this.title,
+      required this.length,
       required this.index,
       this.imgPath,
       this.duration});
@@ -36,15 +39,21 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   // CrossFadeState _replayCrossFadeState = CrossFadeState.showFirst;
   String position = "00:00";
   int positionInSeconds = 0;
+  int positionInML = 0;
   int durationInSeconds = 100;
-  int length = 0;
+  int durationInML = 10000;
+  int flag = 0;
+
+  // int length = 0;
 
   bool doesClicked = false;
 
-  Future<void> goToNextSong() async {
+  goToNextSong() async {
     final Song? nextSong = context.read<SongCubit>().getNextSong();
     if (nextSong != null) {
-      startFunction(urlPath: nextSong.urlPath, index: nextSong.indexId);
+      print("GETTING THE NEXT SONG");
+      print(nextSong.title);
+      await startFunction(urlPath: nextSong.urlPath, index: nextSong.indexId);
       if (mounted)
         setState(() {
           widget.title = nextSong.title;
@@ -52,33 +61,16 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           widget.duration = nextSong.duration;
           _crossFadeState = CrossFadeState.showFirst;
           widget.index = nextSong.indexId;
+          flag = 0;
         });
-    } else {}
+    } else {
+      print("Next song is null");
+    }
   }
 
-  // Future<void> goToNextSong() async {
-  //   final Song? nextSong = context.read<SongCubit>().getNextSong();
-  //   if (nextSong != null) {
-  //     try {
-  //       startFunction(urlPath: nextSong.urlPath, index: nextSong.indexId);
-  //       if (mounted)
-  //         setState(() {
-  //           widget.title = nextSong.title;
-  //           widget.imgPath = nextSong.imgPath;
-  //           widget.duration = nextSong.duration;
-  //           _crossFadeState = CrossFadeState.showFirst;
-  //           widget.index = nextSong.indexId;
-  //         });
-  //     } catch (e) {
-  //       Future.delayed(Duration(milliseconds: 150), () {
-  //         goToNextSong();
-  //       });
-  //     }
-  //   } else {}
-  // }
-
-  Future<void> getToPrevious() async {
+  getToPrevious() {
     final Song? previousSong = context.read<SongCubit>().getPreviousSong();
+
     if (previousSong != null) {
       startFunction(urlPath: previousSong.urlPath, index: previousSong.indexId);
       if (mounted)
@@ -91,37 +83,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         });
     } else {}
   }
-
-  // Future<void> getToPrevious() async {
-  //   final Song? previousSong = context.read<SongCubit>().getPreviousSong();
-  //   if (previousSong != null) {
-  //     startFunction(urlPath: previousSong.urlPath, index: previousSong.indexId);
-  //     if (mounted)
-  //       setState(() {
-  //         widget.title = previousSong.title;
-  //         widget.imgPath = previousSong.imgPath;
-  //         widget.duration = previousSong.duration;
-  //         _crossFadeState = CrossFadeState.showFirst;
-  //         widget.index = previousSong.indexId;
-  //       });
-  //     try {
-  //       startFunction(
-  //           urlPath: previousSong.urlPath, index: previousSong.indexId);
-  //       if (mounted)
-  //         setState(() {
-  //           widget.title = previousSong.title;
-  //           widget.imgPath = previousSong.imgPath;
-  //           widget.duration = previousSong.duration;
-  //           _crossFadeState = CrossFadeState.showFirst;
-  //           widget.index = previousSong.indexId;
-  //         });
-  //     } catch (e) {
-  //       Future.delayed(Duration(milliseconds: 150), () {
-  //         getToPrevious();
-  //       });
-  //     }
-  //   } else {}
-  // }
 
   @override
   void initState() {
@@ -140,39 +101,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     // int length = 0;
     if (mounted)
       setState(() {
-        length = context
+        widget.length = context
             .read<SongCubit>()
             .theList[context.read<SongCubit>().category]!
             .length;
       });
 
     // context.read<AudioPlayerCubit>().resumeAudio();
-    if (!mounted) return;
-    context
-        .read<AudioPlayerCubit>()
-        .audioPlayer
-        .onPositionChanged
-        .listen((Duration newPosition) {
-      int inSeconds = newPosition.inSeconds;
-      int seconds = newPosition.inSeconds % 60;
-      int minutes = newPosition.inMinutes;
-      int hours = newPosition.inHours;
-      if (hours > 0) {
-        if (mounted)
-          setState(() {
-            position =
-                "${hours < 10 ? '0$hours' : hours}:${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10 ? '0$seconds' : seconds}";
-            positionInSeconds = inSeconds;
-          });
-      } else {
-        if (mounted)
-          setState(() {
-            position =
-                "${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10 ? '0$seconds' : seconds}";
-            positionInSeconds = inSeconds;
-          });
-      }
-    });
 
     context
         .read<AudioPlayerCubit>()
@@ -183,40 +118,60 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       if (mounted)
         setState(() {
           durationInSeconds = getDurationInSeconds;
+          durationInML = newDuration.inMicroseconds;
         });
-      if ((positionInSeconds == durationInSeconds) && (!doesClicked)) {
-        print("DEGISIYIOR");
-        print("DEGISIYIOR");
-        print("DEGISIYIOR");
-        print("DEGISIYIOR");
-        print("DEGISIYIOR");
-        print("DEGISIYIOR");
-        print("DEGISIYIOR");
+    });
+
+    if (!mounted) return;
+    context
+        .read<AudioPlayerCubit>()
+        .audioPlayer
+        .onPositionChanged
+        .listen((Duration newPosition) async {
+      int inSeconds = newPosition.inSeconds;
+      int seconds = newPosition.inSeconds % 60;
+      int minutes = newPosition.inMinutes % 60;
+      int hours = newPosition.inHours;
+      if (hours > 0) {
+        if (mounted)
+          setState(() {
+            position =
+                "${hours < 10 ? '0$hours' : hours}:${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10 ? '0$seconds' : seconds}";
+            positionInSeconds = inSeconds;
+            positionInML = newPosition.inMicroseconds;
+          });
+      } else {
+        if (mounted)
+          setState(() {
+            position =
+                "${minutes < 10 ? '0$minutes' : minutes}:${seconds < 10 ? '0$seconds' : seconds}";
+            positionInSeconds = inSeconds;
+          });
+      }
+      // print("\nposition:${positionInSeconds}\nduration:${durationInSeconds}\nisTouched:${doesClicked}");
+      if ((positionInSeconds == (durationInSeconds)) &&
+          (!doesClicked) &&
+          (flag == 0)) {
+        print("GOT INTO THE THING");
+        flag = 1;
+        await Timer(Duration(milliseconds: 400), () {});
+        await context.read<AudioPlayerCubit>().audioPlayer.stop();
+
         if (mounted)
           setState(() {
             _crossFadeState = CrossFadeState.showSecond;
+            setState(() {
+              positionInSeconds = 0;
+            });
           });
-        Future.delayed(Duration(milliseconds: 300), () {
-          goToNextSong();
-        });
-        // final Song? nextSong = context.read<SongCubit>().getNextSong();
-        // if (nextSong != null) {
-        //   startFunction(urlPath: nextSong.urlPath, index: nextSong.indexId);
-        //   if (mounted)
-        //     setState(() {
-        //       widget.title = nextSong.title;
-        //       widget.imgPath = nextSong.imgPath;
-        //       widget.duration = nextSong.duration;
-        //       _crossFadeState = CrossFadeState.showFirst;
-        //       widget.index = nextSong.indexId;
-        //       positionInSeconds = 0;
-        //       durationInSeconds = 0;
-        //     });
-        // } else {}
-
-        // Future.delayed(Duration(milliseconds: 300), () {
-        //   goToNextSong();
-        // });
+        try {
+          await goToNextSong();
+        } catch (e) {
+          print(e);
+          print("ERRROORR OCCURED");
+          await context.read<AudioPlayerCubit>().audioPlayer.stop();
+          await startFunction(urlPath: widget.urlPath, index: widget.index);
+        }
       }
     });
   }
@@ -311,9 +266,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             Expanded(
               child: IconButton(
                   onPressed: () {
-                    Future.delayed(Duration(milliseconds: 350), () {
-                      getToPrevious();
-                    });
+                    getToPrevious();
                   },
                   icon: const Icon(Icons.fast_rewind)),
             ),
@@ -366,9 +319,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             Expanded(
               child: IconButton(
                   onPressed: () {
-                    Future.delayed(Duration(milliseconds: 350), () {
-                      goToNextSong();
-                    });
+                    goToNextSong();
                     // final Song? nextSong =
                     //     context.read<SongCubit>().getNextSong();
                     // if (nextSong != null) {
@@ -465,7 +416,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                "${(widget.index + 1).toString()}/${length}",
+                "${(widget.index + 1).toString()}/${widget.length}",
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontFamily: "Campton_Light",
@@ -541,24 +492,30 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       max: durationInSeconds.toDouble(),
       value: positionInSeconds.toDouble(),
       divisions: 200,
-      onChangeStart: (taken) {
+      onChangeStart: (taken) async {
+        await context.read<AudioPlayerCubit>().audioPlayer.pause();
         setState(() {
           doesClicked = true;
+          _crossFadeState = CrossFadeState.showSecond;
         });
       },
-      onChangeEnd: (taken) {
+      onChangeEnd: (taken) async {
         setState(() {
           doesClicked = false;
         });
 
         if ((positionInSeconds == durationInSeconds)) {
-          Future.delayed(Duration(milliseconds: 300), () {
+          await Future.delayed(Duration(milliseconds: 400), () {
             goToNextSong();
+          });
+        } else {
+          await context.read<AudioPlayerCubit>().audioPlayer.resume();
+          setState(() {
+            _crossFadeState = CrossFadeState.showFirst;
           });
         }
       },
       onChanged: (value) async {
-        print(value.toInt());
         final position = Duration(seconds: value.toInt());
         await context.read<AudioPlayerCubit>().audioPlayer.seek(position);
         // can be changed to not resume
@@ -571,6 +528,18 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         //   Future.delayed(Duration(milliseconds: 300), () {
         //     goToNextSong();
         //   });
+        // }
+        //
+        // if ((value.toInt() == (durationInSeconds)) && (!doesClicked)) {
+        //   Timer(Duration(milliseconds: 500), () { });
+        //   if (mounted)
+        //     setState(() {
+        //       _crossFadeState = CrossFadeState.showSecond;
+        //       setState(() {
+        //         positionInSeconds = 0;
+        //       });
+        //     });
+        //   await goToNextSong();
         // }
       },
     );
